@@ -362,6 +362,9 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
+# binaries
 FakeAnim/Sections/Spoofy_signed.bin
 FakeAnim/Sections/Expansion.bin
-FakeAnim/Release_LTCG
+
+# build directory
+FakeAnim/FakeAnim/Release_LTCG
