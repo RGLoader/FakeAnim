@@ -1,0 +1,5 @@
+LIBRARY bootanim
+EXPORTS
+	AnipPlayBootAnimation @1
+	AnipEndAnimation @2
+	AnipSetLogo @3
