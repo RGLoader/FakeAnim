@@ -170,6 +170,8 @@ BOOL Initialize() {  // HANDLE hModule) {
 		InfoPrint("Error patching shadowboot path!\n");
 	}
 
+	// shadowboot will happen automatically right after this if it's quick enough
+
 	// shadowboot!
 	/*InfoPrint("Attempting to shadowboot...\n");
 	CreateShadowbootThread(SHADOWBOOT_FILE);*/

@@ -363,8 +363,8 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # binaries
-FakeAnim/Sections/Spoofy_signed.bin
-FakeAnim/Sections/Expansion.bin
+/FakeAnim/Sections/Spoofy_signed.bin
+/FakeAnim/Sections/Expansion.bin
 
 # build directory
-FakeAnim/FakeAnim/Release_LTCG/
+/FakeAnim/Release_LTCG

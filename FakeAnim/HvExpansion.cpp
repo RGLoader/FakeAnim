@@ -136,8 +136,7 @@ BOOL ApplyHVPatches(BYTE* patches, size_t size)
 	return FALSE;
 }
 
-DWORD InstallExpansion()
-{
+DWORD InstallExpansion() {
 	PVOID pSecData;
 	ULONG pSecSize;
 	if (!XGetModuleSection(ModuleHandle, "exp", &pSecData, &pSecSize)) {
@@ -155,8 +154,6 @@ DWORD InstallExpansion()
 }
 
 BOOL LaunchXell() {
-	InfoPrint("%08X\n", ModuleHandle);
-
 	PVOID pSecData;
 	ULONG pSecSize;
 	if (!XGetModuleSection(ModuleHandle, "xell", &pSecData, &pSecSize)) {
