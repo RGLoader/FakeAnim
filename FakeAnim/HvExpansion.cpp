@@ -45,17 +45,17 @@ QWORD HvPeekQWORD(QWORD Address)
 NTSTATUS HvPeekBytes(QWORD Address, PVOID Buffer, DWORD Size)
 {
 	NTSTATUS result = STATUS_MEMORY_NOT_ALLOCATED;
-	VOID* data = XPhysicalAlloc(Size, MAXULONG_PTR, 0, PAGE_READWRITE);
-	if (data != NULL)
+	VOID* allocData = XPhysicalAlloc(Size, MAXULONG_PTR, 0, PAGE_READWRITE);
+	if (allocData != NULL)
 	{
-		QWORD daddr = (QWORD)((DWORD)MmGetPhysicalAddress(data) & 0xFFFFFFFF);
-		ZeroMemory(data, Size);
+		QWORD daddr = (QWORD)((DWORD)MmGetPhysicalAddress(allocData) & 0xFFFFFFFF);
+		ZeroMemory(allocData, Size);
 		result = (NTSTATUS)HvxExpansionCall(EXPANSION_SIG, PeekBytes, Address, daddr, Size);
 		if (NT_SUCCESS(result))
-			memcpy(Buffer, data, Size);
-		XPhysicalFree(data);
+			memcpy(Buffer, allocData, Size);
+		XPhysicalFree(allocData);
 	} else
-		InfoPrint("Error allocating buffer!");
+		Utils::InfoPrint("Error allocating buffer!\n");
 	return result;
 }
 
@@ -82,15 +82,15 @@ NTSTATUS HvPokeQWORD(QWORD Address, QWORD Value)
 NTSTATUS HvPokeBytes(QWORD Address, const void* Buffer, DWORD Size)
 {
 	NTSTATUS result = STATUS_MEMORY_NOT_ALLOCATED;
-	VOID* data = XPhysicalAlloc(Size, MAXULONG_PTR, 0, PAGE_READWRITE);
-	if (data != NULL)
+	VOID* allocData = XPhysicalAlloc(Size, MAXULONG_PTR, 0, PAGE_READWRITE);
+	if (allocData != NULL)
 	{
-		QWORD daddr = (QWORD)((DWORD)MmGetPhysicalAddress(data) & 0xFFFFFFFF);
-		memcpy(data, Buffer, Size);
+		QWORD daddr = (QWORD)((DWORD)MmGetPhysicalAddress(allocData) & 0xFFFFFFFF);
+		memcpy(allocData, Buffer, Size);
 		result = (NTSTATUS)HvxExpansionCall(EXPANSION_SIG, PokeBytes, Address, daddr, Size);
-		XPhysicalFree(data);
+		XPhysicalFree(allocData);
 	} else
-		InfoPrint("Error allocating buffer!");
+		Utils::InfoPrint("Error allocating buffer!\n");
 	return result;
 }
 
@@ -140,7 +140,7 @@ DWORD InstallExpansion() {
 	PVOID pSecData;
 	ULONG pSecSize;
 	if (!XGetModuleSection(ModuleHandle, "exp", &pSecData, &pSecSize)) {
-		InfoPrint("Error getting \"exp\" section!\n");
+		Utils::InfoPrint("Error getting \"exp\" section!\n");
 		return NULL;
 	}
 
@@ -157,7 +157,7 @@ BOOL LaunchXell() {
 	PVOID pSecData;
 	ULONG pSecSize;
 	if (!XGetModuleSection(ModuleHandle, "xell", &pSecData, &pSecSize)) {
-		InfoPrint("Error getting \"xell\" section!\n");
+		Utils::InfoPrint("Error getting \"xell\" section!\n");
 		return FALSE;
 	}
 

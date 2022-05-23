@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-void InfoPrint(const char* data, ...) {
+void Utils::InfoPrint(const char* data, ...) {
 	va_list argp;
 	char temp[512];
 
@@ -11,13 +11,13 @@ void InfoPrint(const char* data, ...) {
 	DbgPrint(temp);
 }
 
-void HexPrint(BYTE* data, size_t len) {
-	for (int i = 0; i < len; i++) {
-		DbgPrint("%02X", data[i]);
+void Utils::HexPrint(PBYTE pbData, size_t stLen) {
+	for (int i = 0; i < stLen; i++) {
+		DbgPrint("%02X", pbData[i]);
 	}
 }
 
-HRESULT MountPath(const char* szDrive, const char* szDevice, const char* sysStr)
+HRESULT Utils::MountPath(const char* szDrive, const char* szDevice, const char* sysStr)
 {
 	STRING DeviceName, LinkName;
 	CHAR szDestinationDrive[MAX_PATH];
@@ -28,63 +28,65 @@ HRESULT MountPath(const char* szDrive, const char* szDevice, const char* sysStr)
 	return (HRESULT)ObCreateSymbolicLink(&LinkName, &DeviceName);
 }
 
-HRESULT CreateSymbolicLink(const char* szDrive, const char* szDevice, BOOL both) {
+HRESULT Utils::CreateSymbolicLink(const char* szDrive, const char* szDevice, BOOL both) {
 	HRESULT res = -1;
 	if (both) {
 		InfoPrint("Mounting as both!\n");
-		res = MountPath(szDrive, szDevice, OBJ_SYS_STRING);
-		res |= MountPath(szDrive, szDevice, OBJ_USR_STRING);
+		res = Utils::MountPath(szDrive, szDevice, OBJ_SYS_STRING);
+		res |= Utils::MountPath(szDrive, szDevice, OBJ_USR_STRING);
 	} else {
 		if (KeGetCurrentProcessType() == PROC_SYSTEM) {
 			InfoPrint("Mounting as system!\n");
-			res = MountPath(szDrive, szDevice, OBJ_SYS_STRING);
+			res = Utils::MountPath(szDrive, szDevice, OBJ_SYS_STRING);
 		} else {
 			InfoPrint("Mounting as user!\n");
-			res = MountPath(szDrive, szDevice, OBJ_USR_STRING);
+			res = Utils::MountPath(szDrive, szDevice, OBJ_USR_STRING);
 		}
 	}
 	return res;
 }
 
-QWORD FileSize(LPCSTR filename)
+QWORD Utils::FileSize(LPCSTR lpFilename)
 {
-	WIN32_FILE_ATTRIBUTE_DATA fad;
-	if (GetFileAttributesEx(filename, GetFileExInfoStandard, &fad) == FALSE)
-		return -1; // error condition, could call GetLastError to find out more
-	LARGE_INTEGER size;
-	size.HighPart = fad.nFileSizeHigh;
-	size.LowPart = fad.nFileSizeLow;
-	return size.QuadPart;
+	HANDLE hFile = CreateFile(lpFilename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hFile == INVALID_HANDLE_VALUE)
+		return false;
+	LARGE_INTEGER liSize;
+	BOOL bRet = ::GetFileSizeEx(hFile, &liSize);
+	CloseHandle(hFile);
+	if (!bRet)
+		return -1;
+	return liSize.QuadPart;
 }
 
-bool ReadFile(LPCSTR filename, PVOID buffer, DWORD size)
+BOOL Utils::ReadFile(LPCSTR lpFilename, PVOID pvBuffer, DWORD dwSize)
 {
-	HANDLE file = CreateFile(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (file == INVALID_HANDLE_VALUE)
+	HANDLE hFile = CreateFile(lpFilename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hFile == INVALID_HANDLE_VALUE)
 	{
-		// InfoPrint("Couldn't open %s\n", filename);
+		// InfoPrint("CreateFile: %04X\n", GetLastError());
 		return false;
 	}
 	DWORD noBytesRead;
-	::ReadFile(file, buffer, size, &noBytesRead, NULL);
-	CloseHandle(file);
+	::ReadFile(hFile, pvBuffer, dwSize, &noBytesRead, NULL);
+	CloseHandle(hFile);
 	if (noBytesRead <= 0)
 		return false;
 	return true;
 }
 
-bool WriteFile(LPCSTR filename, PVOID buffer, DWORD size)
+BOOL Utils::WriteFile(LPCSTR lpFilename, PVOID pvBuffer, DWORD dwSize)
 {
-	HANDLE file = CreateFile(filename, GENERIC_WRITE, NULL, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (file == INVALID_HANDLE_VALUE)
+	HANDLE hFile = CreateFile(lpFilename, GENERIC_WRITE, NULL, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hFile == INVALID_HANDLE_VALUE)
 	{
-		// InfoPrint("Couldn't open %s\n", filename);
+		// InfoPrint("CreateFile: %04X\n", GetLastError());
 		return false;
 	}
 	DWORD noBytesWritten;
-	::WriteFile(file, buffer, size, &noBytesWritten, NULL);
-	CloseHandle(file);
-	if (noBytesWritten != size)
+	::WriteFile(hFile, pvBuffer, dwSize, &noBytesWritten, NULL);
+	CloseHandle(hFile);
+	if (noBytesWritten != dwSize)
 		return false;
 	return true;
 }

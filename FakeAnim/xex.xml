@@ -7,8 +7,7 @@
 		<compressed/>
 		<unencrypted/>
 	</format>
-
-	<!-- <exportcontainer name="FakeAnim.def"/> -->
+	
 	<exportcontainer name="bootanim.xex"/>
 
 	<version major="2" minor="0" build="11775" qfe="0"/>
