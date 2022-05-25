@@ -10,7 +10,7 @@
 
 	<exportcontainer name="bootanim.xex"/>
 
-	<version major="2" minor="0" build="11775" qfe="0"/>
+	<version major="2" minor="0" build="12387" qfe="0"/>
 
 	<mediatypes>
 		<flash/>

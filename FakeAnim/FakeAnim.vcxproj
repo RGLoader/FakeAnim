@@ -131,6 +131,7 @@
     <OutputFile>$(OutDir)bootanim.dll</OutputFile>
     <ImageXexOutput>$(OutDir)bootanim.xex</ImageXexOutput>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DEVKIT|Xbox 360'">
     <LinkIncremental>false</LinkIncremental>
@@ -328,7 +329,7 @@
       <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PreprocessorDefinitions>NDEBUG;_XBOX;LTCG;</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\xkelib;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)xkelib\</AdditionalIncludeDirectories>
       <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
     <Link>
@@ -388,7 +389,7 @@
       <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PreprocessorDefinitions>NDEBUG;_XBOX;LTCG;DEVKIT</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\xkelib;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)xkelib\</AdditionalIncludeDirectories>
       <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
     <Link>

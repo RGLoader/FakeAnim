@@ -296,9 +296,8 @@ lib /def:kernel\kernelext21250.0.def /MACHINE:PPCBE /OUT:kernelext.lib
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PreBuildEvent>
-      <Command>del $(ProjectDir)xamext.lib $(ProjectDir)xamext.exp $(ProjectDir)kernelext.lib $(ProjectDir)kernelext.exp
-lib /def:xam\xamext21256.0.def /MACHINE:PPCBE /OUT:xamext.lib
-lib /def:kernel\kernelext21256.0.def /MACHINE:PPCBE /OUT:kernelext.lib
+      <Command>del "$(OutDir)kernelext.lib" "$(OutDir)kernelext.exp"
+lib /def:"$(ProjectDir)kernel\kernelext21256.0.def" /MACHINE:PPCBE /OUT:"$(OutDir)kernelext.lib"
 </Command>
     </PreBuildEvent>
     <PreBuildEvent>
@@ -341,8 +340,8 @@ lib /def:kernel\kernelext21256.0.def /MACHINE:PPCBE /OUT:kernelext.lib
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PreBuildEvent>
-      <Command>del $(ProjectDir)kernelext.lib $(ProjectDir)kernelext.exp
-lib /def:kernel\kernelext11775.3.def /MACHINE:PPCBE /OUT:kernelext.lib
+      <Command>del "$(OutDir)kernelext.lib" "$(OutDir)kernelext.exp"
+lib /def:"$(ProjectDir)kernel\kernelext11775.3.def" /MACHINE:PPCBE /OUT:"$(OutDir)kernelext.lib"
 </Command>
     </PreBuildEvent>
     <PreBuildEvent>
