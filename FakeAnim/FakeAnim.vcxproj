@@ -9,6 +9,10 @@
       <Configuration>Debug</Configuration>
       <Platform>Xbox 360</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="DEVKIT|Xbox 360">
+      <Configuration>DEVKIT</Configuration>
+      <Platform>Xbox 360</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Profile|Xbox 360">
       <Configuration>Profile</Configuration>
       <Platform>Xbox 360</Platform>
@@ -23,6 +27,10 @@
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release_LTCG|Xbox 360">
       <Configuration>Release_LTCG</Configuration>
+      <Platform>Xbox 360</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="TESTKIT|Xbox 360">
+      <Configuration>TESTKIT</Configuration>
       <Platform>Xbox 360</Platform>
     </ProjectConfiguration>
   </ItemGroup>
@@ -57,6 +65,18 @@
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>2010-01</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TESTKIT|Xbox 360'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>2010-01</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DEVKIT|Xbox 360'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>2010-01</PlatformToolset>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -78,6 +98,12 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release_LTCG|Xbox 360'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='TESTKIT|Xbox 360'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DEVKIT|Xbox 360'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Xbox 360'">
     <LinkIncremental>true</LinkIncremental>
@@ -95,6 +121,18 @@
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_LTCG|Xbox 360'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutputFile>$(OutDir)bootanim.dll</OutputFile>
+    <ImageXexOutput>$(OutDir)bootanim.xex</ImageXexOutput>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TESTKIT|Xbox 360'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutputFile>$(OutDir)bootanim.dll</OutputFile>
+    <ImageXexOutput>$(OutDir)bootanim.xex</ImageXexOutput>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DEVKIT|Xbox 360'">
     <LinkIncremental>false</LinkIncremental>
     <OutputFile>$(OutDir)bootanim.dll</OutputFile>
     <ImageXexOutput>$(OutDir)bootanim.xex</ImageXexOutput>
@@ -276,6 +314,126 @@
       <OutputFile>$(OutDir)bootanim.bsc</OutputFile>
     </Bscmake>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TESTKIT|Xbox 360'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <StringPooling>true</StringPooling>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <ExceptionHandling>false</ExceptionHandling>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PreprocessorDefinitions>NDEBUG;_XBOX;LTCG;</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\xkelib;</AdditionalIncludeDirectories>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
+      <SetChecksum>true</SetChecksum>
+      <AdditionalDependencies>xapilib.lib;xboxkrnl.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\xkelib;</AdditionalLibraryDirectories>
+      <BaseAddress>
+      </BaseAddress>
+      <FixedBaseAddress>true</FixedBaseAddress>
+      <AdditionalOptions>/ALIGN:128,4096 /dll %(AdditionalOptions)</AdditionalOptions>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <NoEntryPoint>true</NoEntryPoint>
+      <ProfileGuidedDatabase>$(TargetDir)bootanim.pgd</ProfileGuidedDatabase>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
+      <ModuleDefinitionFile>$(ProjectDir)FakeAnim.def</ModuleDefinitionFile>
+      <AutomaticModuleDefinitionFile>
+      </AutomaticModuleDefinitionFile>
+    </Link>
+    <Deploy>
+      <ForceCopy>true</ForceCopy>
+      <DeploymentType>CopyToHardDrive</DeploymentType>
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </Deploy>
+    <ImageXex>
+      <ConfigurationFile>testkit.xml</ConfigurationFile>
+      <BaseAddress>0x98000000</BaseAddress>
+      <ExportByName>false</ExportByName>
+      <HeapSize>0</HeapSize>
+      <WorkspaceSize>0</WorkspaceSize>
+    </ImageXex>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+    </ProjectReference>
+    <Bscmake>
+      <OutputFile>$(OutDir)bootanim.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DEVKIT|Xbox 360'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <StringPooling>true</StringPooling>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <ExceptionHandling>false</ExceptionHandling>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PreprocessorDefinitions>NDEBUG;_XBOX;LTCG;DEVKIT</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\xkelib;</AdditionalIncludeDirectories>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
+      <SetChecksum>true</SetChecksum>
+      <AdditionalDependencies>xapilib.lib;xboxkrnl.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\xkelib;</AdditionalLibraryDirectories>
+      <BaseAddress>
+      </BaseAddress>
+      <FixedBaseAddress>true</FixedBaseAddress>
+      <AdditionalOptions>/ALIGN:128,4096 /dll %(AdditionalOptions)</AdditionalOptions>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <NoEntryPoint>true</NoEntryPoint>
+      <ProfileGuidedDatabase>$(TargetDir)bootanim.pgd</ProfileGuidedDatabase>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
+      <ModuleDefinitionFile>$(ProjectDir)FakeAnim.def</ModuleDefinitionFile>
+      <AutomaticModuleDefinitionFile>
+      </AutomaticModuleDefinitionFile>
+    </Link>
+    <Deploy>
+      <ForceCopy>true</ForceCopy>
+      <DeploymentType>CopyToHardDrive</DeploymentType>
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </Deploy>
+    <ImageXex>
+      <ConfigurationFile>devkit.xml</ConfigurationFile>
+      <BaseAddress>0x98000000</BaseAddress>
+      <ExportByName>false</ExportByName>
+      <HeapSize>0</HeapSize>
+      <WorkspaceSize>0</WorkspaceSize>
+    </ImageXex>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+    </ProjectReference>
+    <Bscmake>
+      <OutputFile>$(OutDir)bootanim.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Bootanim.h" />
     <ClInclude Include="Hooks.h" />
@@ -298,15 +456,18 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile_FastCap|Xbox 360'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Xbox 360'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_LTCG|Xbox 360'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TESTKIT|Xbox 360'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DEVKIT|Xbox 360'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="devkit.xml" />
     <None Include="FakeAnim.def" />
     <None Include="Sections\HVPP_signed.bin" />
     <None Include="Sections\Patches.bin" />
     <None Include="Sections\xell-2f.bin" />
-    <None Include="xex.xml">
+    <None Include="testkit.xml">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>

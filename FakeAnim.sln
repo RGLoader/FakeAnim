@@ -9,6 +9,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xkelib", "xkelib\xkelib.vcx
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BBD7D8AA-B6C2-4415-BD7B-9E312192D32E}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -16,6 +17,7 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CodeAnalysis|Xbox 360 = CodeAnalysis|Xbox 360
 		Debug|Xbox 360 = Debug|Xbox 360
+		DEVKIT|Xbox 360 = DEVKIT|Xbox 360
 		Profile_FastCap|Xbox 360 = Profile_FastCap|Xbox 360
 		Profile|Xbox 360 = Profile|Xbox 360
 		Release_LTCG|Xbox 360 = Release_LTCG|Xbox 360
@@ -26,12 +28,16 @@ Global
 		Release21173.0|Xbox 360 = Release21173.0|Xbox 360
 		Release21250.0|Xbox 360 = Release21250.0|Xbox 360
 		Release21256.0|Xbox 360 = Release21256.0|Xbox 360
+		TESTKIT|Xbox 360 = TESTKIT|Xbox 360
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{E938DD88-351A-41DA-A512-99EDCAF4C3D4}.CodeAnalysis|Xbox 360.ActiveCfg = CodeAnalysis|Xbox 360
 		{E938DD88-351A-41DA-A512-99EDCAF4C3D4}.CodeAnalysis|Xbox 360.Build.0 = CodeAnalysis|Xbox 360
 		{E938DD88-351A-41DA-A512-99EDCAF4C3D4}.Debug|Xbox 360.ActiveCfg = Debug|Xbox 360
 		{E938DD88-351A-41DA-A512-99EDCAF4C3D4}.Debug|Xbox 360.Build.0 = Debug|Xbox 360
+		{E938DD88-351A-41DA-A512-99EDCAF4C3D4}.DEVKIT|Xbox 360.ActiveCfg = DEVKIT|Xbox 360
+		{E938DD88-351A-41DA-A512-99EDCAF4C3D4}.DEVKIT|Xbox 360.Build.0 = DEVKIT|Xbox 360
+		{E938DD88-351A-41DA-A512-99EDCAF4C3D4}.DEVKIT|Xbox 360.Deploy.0 = DEVKIT|Xbox 360
 		{E938DD88-351A-41DA-A512-99EDCAF4C3D4}.Profile_FastCap|Xbox 360.ActiveCfg = Profile_FastCap|Xbox 360
 		{E938DD88-351A-41DA-A512-99EDCAF4C3D4}.Profile_FastCap|Xbox 360.Build.0 = Profile_FastCap|Xbox 360
 		{E938DD88-351A-41DA-A512-99EDCAF4C3D4}.Profile|Xbox 360.ActiveCfg = Profile|Xbox 360
@@ -58,12 +64,17 @@ Global
 		{E938DD88-351A-41DA-A512-99EDCAF4C3D4}.Release21256.0|Xbox 360.ActiveCfg = Release_LTCG|Xbox 360
 		{E938DD88-351A-41DA-A512-99EDCAF4C3D4}.Release21256.0|Xbox 360.Build.0 = Release_LTCG|Xbox 360
 		{E938DD88-351A-41DA-A512-99EDCAF4C3D4}.Release21256.0|Xbox 360.Deploy.0 = Release_LTCG|Xbox 360
+		{E938DD88-351A-41DA-A512-99EDCAF4C3D4}.TESTKIT|Xbox 360.ActiveCfg = TESTKIT|Xbox 360
+		{E938DD88-351A-41DA-A512-99EDCAF4C3D4}.TESTKIT|Xbox 360.Build.0 = TESTKIT|Xbox 360
+		{E938DD88-351A-41DA-A512-99EDCAF4C3D4}.TESTKIT|Xbox 360.Deploy.0 = TESTKIT|Xbox 360
 		{83FEF217-22EE-4768-80BF-9F48D5B4564C}.CodeAnalysis|Xbox 360.ActiveCfg = Release21256.0|Xbox 360
 		{83FEF217-22EE-4768-80BF-9F48D5B4564C}.CodeAnalysis|Xbox 360.Build.0 = Release21256.0|Xbox 360
 		{83FEF217-22EE-4768-80BF-9F48D5B4564C}.CodeAnalysis|Xbox 360.Deploy.0 = Release21256.0|Xbox 360
 		{83FEF217-22EE-4768-80BF-9F48D5B4564C}.Debug|Xbox 360.ActiveCfg = Release21256.0|Xbox 360
 		{83FEF217-22EE-4768-80BF-9F48D5B4564C}.Debug|Xbox 360.Build.0 = Release21256.0|Xbox 360
 		{83FEF217-22EE-4768-80BF-9F48D5B4564C}.Debug|Xbox 360.Deploy.0 = Release21256.0|Xbox 360
+		{83FEF217-22EE-4768-80BF-9F48D5B4564C}.DEVKIT|Xbox 360.ActiveCfg = Release21256.0|Xbox 360
+		{83FEF217-22EE-4768-80BF-9F48D5B4564C}.DEVKIT|Xbox 360.Build.0 = Release21256.0|Xbox 360
 		{83FEF217-22EE-4768-80BF-9F48D5B4564C}.Profile_FastCap|Xbox 360.ActiveCfg = Release21256.0|Xbox 360
 		{83FEF217-22EE-4768-80BF-9F48D5B4564C}.Profile_FastCap|Xbox 360.Build.0 = Release21256.0|Xbox 360
 		{83FEF217-22EE-4768-80BF-9F48D5B4564C}.Profile_FastCap|Xbox 360.Deploy.0 = Release21256.0|Xbox 360
@@ -93,6 +104,8 @@ Global
 		{83FEF217-22EE-4768-80BF-9F48D5B4564C}.Release21256.0|Xbox 360.ActiveCfg = Release21256.0|Xbox 360
 		{83FEF217-22EE-4768-80BF-9F48D5B4564C}.Release21256.0|Xbox 360.Build.0 = Release21256.0|Xbox 360
 		{83FEF217-22EE-4768-80BF-9F48D5B4564C}.Release21256.0|Xbox 360.Deploy.0 = Release21256.0|Xbox 360
+		{83FEF217-22EE-4768-80BF-9F48D5B4564C}.TESTKIT|Xbox 360.ActiveCfg = Release11775.3|Xbox 360
+		{83FEF217-22EE-4768-80BF-9F48D5B4564C}.TESTKIT|Xbox 360.Build.0 = Release11775.3|Xbox 360
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

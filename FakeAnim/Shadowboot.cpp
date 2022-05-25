@@ -275,7 +275,7 @@ void CreateShadowbootThread(LPCSTR lpFilename) {
 
 	// PatchShadowboot(pbData, qwSize);
 
-#ifndef DEVKIT_TEST
+#ifndef DEVKIT
 	HANDLE hThread;
 	DWORD hThreadId;
 	Shadowboot::LAUNCH_SHADOWBOOT_ARGS lsa = { 0 };

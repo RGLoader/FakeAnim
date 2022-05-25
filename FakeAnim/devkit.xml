@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xex>
+	<gameregion system=""/>
+	<titleid id="0x00000000"/>
+
+	<format>
+		<compressed/>
+		<unencrypted/>
+	</format>
+
+	<exportcontainer name="bootanim.xex"/>
+
+	<version major="2" minor="0" build="11775" qfe="0"/>
+
+	<mediatypes>
+		<flash/>
+	</mediatypes>
+
+	<boundpath path="\Device\Flash\bootanim.xex"/>
+
+	<section file ="Sections\Spoofy_signed.bin" name ="exp" memory ="RO"/>
+	<section file ="Sections\Patches.bin" name ="patches" memory ="RO"/>
+	<section file ="Sections\xell-2f.bin" name ="xell" memory ="RO"/>
+
+	<baseaddr addr="0x98000000"/>
+</xex>

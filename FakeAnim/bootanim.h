@@ -7,7 +7,7 @@
 #define SHADOWBOOT_FILE "Hdd:\\shadowboot.bin"
 
 namespace Bootanim {
-	enum INITIALIZE_THREAD_EXIT_CODE : DWORD {
+	typedef enum INITIALIZE_THREAD_EXIT_CODE : DWORD {
 		SUCCESS = 0,
 		EJECT_BAIL,
 		MODEL_ERROR,
@@ -19,5 +19,3 @@ namespace Bootanim {
 		PATH_ERROR,
 	};
 }
-
-// #define DEVKIT_TEST

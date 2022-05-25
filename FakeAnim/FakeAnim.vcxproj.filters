@@ -57,12 +57,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="xex.xml" />
+    <None Include="testkit.xml" />
     <None Include="FakeAnim.def">
       <Filter>Source Files</Filter>
     </None>
     <None Include="Sections\HVPP_signed.bin" />
     <None Include="Sections\xell-2f.bin" />
     <None Include="Sections\Patches.bin" />
+    <None Include="devkit.xml" />
   </ItemGroup>
 </Project>

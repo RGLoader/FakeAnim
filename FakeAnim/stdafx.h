@@ -16,6 +16,4 @@
 #include "Hypervisor.h"
 #include "Bootanim.h"
 
-// #define DEVKIT_TEST
-
 // TODO: reference additional headers your program requires here

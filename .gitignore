@@ -368,3 +368,5 @@ FodyWeavers.xsd
 
 # build directory
 /FakeAnim/Release_LTCG
+/FakeAnim/DEVKIT
+/FakeAnim/TESTKIT
