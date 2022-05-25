@@ -23,7 +23,13 @@
     <ClInclude Include="Shadowboot.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="bootanim.h">
+    <ClInclude Include="Bootanim.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Hypervisor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -40,7 +46,13 @@
     <ClCompile Include="Shadowboot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="bootanim.cpp">
+    <ClCompile Include="Bootanim.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Hooks.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Hypervisor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

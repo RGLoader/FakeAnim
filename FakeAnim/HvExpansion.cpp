@@ -4,98 +4,73 @@ using namespace std;
 
 extern HANDLE ModuleHandle;
 
-DWORD _declspec(naked) HvxExpansionInstall(INT64 addr, DWORD size)
+BYTE HvPeekBYTE(QWORD qwAddr)
 {
-	__asm {
-		li      r0, EXPANSION_INST_SC
-		sc
-		blr
-	}
+	return (BYTE)HvxExpansionCall(EXPANSION_SIG, PeekBYTE, qwAddr, 0, 0);
 }
 
-QWORD __declspec(naked) HvxExpansionCall(DWORD sig, QWORD Arg1, QWORD Arg2, QWORD Arg3, QWORD Arg4)
+WORD HvPeekWORD(QWORD qwAddr)
 {
-	__asm {
-		li      r0, EXPANSION_CALL_SC
-		sc
-		blr
-	}
+	return (WORD)HvxExpansionCall(EXPANSION_SIG, PeekWORD, qwAddr, 0, 0);
 }
 
-BYTE HvPeekBYTE(QWORD Address)
+DWORD HvPeekDWORD(QWORD qwAddr)
 {
-	return (BYTE)HvxExpansionCall(EXPANSION_SIG, PeekBYTE, Address, 0, 0);
+	return (DWORD)HvxExpansionCall(EXPANSION_SIG, PeekDWORD, qwAddr, 0, 0);
 }
 
-WORD HvPeekWORD(QWORD Address)
+QWORD HvPeekQWORD(QWORD qwAddr)
 {
-	return (WORD)HvxExpansionCall(EXPANSION_SIG, PeekWORD, Address, 0, 0);
+	return HvxExpansionCall(EXPANSION_SIG, PeekQWORD, qwAddr, 0, 0);
 }
 
-DWORD HvPeekDWORD(QWORD Address)
-{
-	return (DWORD)HvxExpansionCall(EXPANSION_SIG, PeekDWORD, Address, 0, 0);
-}
-
-QWORD HvPeekQWORD(QWORD Address)
-{
-	return HvxExpansionCall(EXPANSION_SIG, PeekQWORD, Address, 0, 0);
-}
-
-NTSTATUS HvPeekBytes(QWORD Address, PVOID Buffer, DWORD Size)
-{
+NTSTATUS HvPeekBytes(QWORD qwAddr, PVOID pvBuffer, DWORD dwSize) {
 	NTSTATUS result = STATUS_MEMORY_NOT_ALLOCATED;
-	VOID* allocData = XPhysicalAlloc(Size, MAXULONG_PTR, 0, PAGE_READWRITE);
+	VOID* allocData = XPhysicalAlloc(dwSize, MAXULONG_PTR, 0, PAGE_READWRITE);
 	if (allocData != NULL)
 	{
 		QWORD daddr = (QWORD)((DWORD)MmGetPhysicalAddress(allocData) & 0xFFFFFFFF);
-		ZeroMemory(allocData, Size);
-		result = (NTSTATUS)HvxExpansionCall(EXPANSION_SIG, PeekBytes, Address, daddr, Size);
+		ZeroMemory(allocData, dwSize);
+		result = (NTSTATUS)HvxExpansionCall(EXPANSION_SIG, PeekBytes, qwAddr, daddr, dwSize);
 		if (NT_SUCCESS(result))
-			memcpy(Buffer, allocData, Size);
+			CopyMemory(pvBuffer, allocData, dwSize);
 		XPhysicalFree(allocData);
 	} else
 		Utils::InfoPrint("Error allocating buffer!\n");
 	return result;
 }
 
-NTSTATUS HvPokeBYTE(QWORD Address, BYTE Value)
-{
-	return (NTSTATUS)HvxExpansionCall(EXPANSION_SIG, PokeBYTE, Address, Value, 0);
+NTSTATUS HvPokeBYTE(QWORD qwAddr, BYTE bValue) {
+	return (NTSTATUS)HvxExpansionCall(EXPANSION_SIG, PokeBYTE, qwAddr, bValue, 0);
 }
 
-NTSTATUS HvPokeWORD(QWORD Address, WORD Value)
-{
-	return (NTSTATUS)HvxExpansionCall(EXPANSION_SIG, PokeWORD, Address, Value, 0);
+NTSTATUS HvPokeWORD(QWORD qwAddr, WORD wValue) {
+	return (NTSTATUS)HvxExpansionCall(EXPANSION_SIG, PokeWORD, qwAddr, wValue, 0);
 }
 
-NTSTATUS HvPokeDWORD(QWORD Address, DWORD Value)
-{
-	return (NTSTATUS)HvxExpansionCall(EXPANSION_SIG, PokeDWORD, Address, Value, 0);
+NTSTATUS HvPokeDWORD(QWORD qwAddr, DWORD dwValue) {
+	return (NTSTATUS)HvxExpansionCall(EXPANSION_SIG, PokeDWORD, qwAddr, dwValue, 0);
 }
 
-NTSTATUS HvPokeQWORD(QWORD Address, QWORD Value)
-{
-	return (NTSTATUS)HvxExpansionCall(EXPANSION_SIG, PokeQWORD, Address, Value, 0);
+NTSTATUS HvPokeQWORD(QWORD qwAddr, QWORD qwValue) {
+	return (NTSTATUS)HvxExpansionCall(EXPANSION_SIG, PokeQWORD, qwAddr, qwValue, 0);
 }
 
-NTSTATUS HvPokeBytes(QWORD Address, const void* Buffer, DWORD Size)
-{
+NTSTATUS HvPokeBytes(QWORD qwAddr, const void* vpBuffer, DWORD dwSize) {
 	NTSTATUS result = STATUS_MEMORY_NOT_ALLOCATED;
-	VOID* allocData = XPhysicalAlloc(Size, MAXULONG_PTR, 0, PAGE_READWRITE);
+	VOID* allocData = XPhysicalAlloc(dwSize, MAXULONG_PTR, 0, PAGE_READWRITE);
 	if (allocData != NULL)
 	{
 		QWORD daddr = (QWORD)((DWORD)MmGetPhysicalAddress(allocData) & 0xFFFFFFFF);
-		memcpy(allocData, Buffer, Size);
-		result = (NTSTATUS)HvxExpansionCall(EXPANSION_SIG, PokeBytes, Address, daddr, Size);
+		CopyMemory(allocData, vpBuffer, dwSize);
+		result = (NTSTATUS)HvxExpansionCall(EXPANSION_SIG, PokeBytes, qwAddr, daddr, dwSize);
 		XPhysicalFree(allocData);
 	} else
 		Utils::InfoPrint("Error allocating buffer!\n");
 	return result;
 }
 
-QWORD HvReadFuseRow(int row)
-{
+QWORD HvReadFuseRow(int row) {
 	if (row < 12)
 	{
 		QWORD addr;
@@ -105,33 +80,31 @@ QWORD HvReadFuseRow(int row)
 	return 0;
 }
 
-QWORD FixHVOffset(QWORD qwOff)
-{
-	if (qwOff > 0x10000)
+QWORD FixHVOffset(QWORD qwOffset) {
+	if (qwOffset > 0x10000)
 	{
-		if (qwOff > 0x30000)
-			qwOff |= 0x600000000;
-		else if (qwOff > 0x20000)
-			qwOff |= 0x400000000;
+		if (qwOffset > 0x30000)
+			qwOffset |= 0x600000000;
+		else if (qwOffset > 0x20000)
+			qwOffset |= 0x400000000;
 		else
-			qwOff |= 0x200000000;
+			qwOffset |= 0x200000000;
 	}
-	return qwOff;
+	return qwOffset;
 }
 
-BOOL ApplyHVPatches(BYTE* patches, size_t size)
-{
-	DWORD offset = 0;
-	BYTE* ppatch = patches;
-	while (offset < size)
+BOOL ApplyHVPatches(PBYTE pbPatches, DWORD dwSize) {
+	DWORD dwOffset = 0;
+	PBYTE pbPatch = pbPatches;
+	while (dwOffset < dwSize)
 	{
-		PHvPatchI patchi = (PHvPatchI)ppatch;
+		PHvPatchI patchi = (PHvPatchI)pbPatch;
 		QWORD paddr = (QWORD)(patchi->addr);
 		if (patchi->addr == 0xFFFFFFFF)
 			return TRUE;
 		HvPokeBytes(FixHVOffset(paddr), patchi->data, patchi->size * 4);
-		offset = offset + 8 + patchi->size * 4;
-		ppatch = &patches[offset];
+		dwOffset = dwOffset + 8 + patchi->size * 4;
+		pbPatch = &pbPatches[dwOffset];
 	}
 	return FALSE;
 }
@@ -144,13 +117,13 @@ DWORD InstallExpansion() {
 		return NULL;
 	}
 
-	BYTE* allocData = (BYTE*)XPhysicalAlloc(0x1000, MAXULONG_PTR, 0, PAGE_READWRITE);
-	ZeroMemory(allocData, 0x1000);
-	memcpy(allocData, pSecData, pSecSize);
-	QWORD addr = (QWORD)MmGetPhysicalAddress(allocData);
-	DWORD ret = HvxExpansionInstall(addr, 0x1000);
-	XPhysicalFree(allocData);
-	return ret;
+	BYTE* pbAlloc = (BYTE*)XPhysicalAlloc(0x1000, MAXULONG_PTR, 0, PAGE_READWRITE);
+	ZeroMemory(pbAlloc, 0x1000);
+	CopyMemory(pbAlloc, pSecData, pSecSize);
+	QWORD qwAddr = (QWORD)MmGetPhysicalAddress(pbAlloc);
+	DWORD dwRet = HvxExpansionInstall(qwAddr, 0x1000);
+	XPhysicalFree(pbAlloc);
+	return dwRet;
 }
 
 BOOL LaunchXell() {
@@ -161,14 +134,14 @@ BOOL LaunchXell() {
 		return FALSE;
 	}
 
-	PBYTE allocData = (PBYTE)XPhysicalAlloc(pSecSize, MAXULONG_PTR, 0, MEM_LARGE_PAGES | PAGE_READWRITE | PAGE_NOCACHE);
-	ZeroMemory(allocData, pSecSize);
-	memcpy(allocData, pSecData, pSecSize);
+	PBYTE pbAlloc = (PBYTE)XPhysicalAlloc(pSecSize, MAXULONG_PTR, 0, MEM_LARGE_PAGES | PAGE_READWRITE | PAGE_NOCACHE);
+	ZeroMemory(pbAlloc, pSecSize);
+	CopyMemory(pbAlloc, pSecData, pSecSize);
 	UINT64 len = 0ULL + (((pSecSize + 3) / 4) & 0xFFFFFFFF);
 	UINT64 src = 0x8000000000000000ULL;
-	src = src + ((DWORD)MmGetPhysicalAddress(allocData));
+	src = src + ((DWORD)MmGetPhysicalAddress(pbAlloc));
 	HvxExpansionCall(EXPANSION_SIG, HvExecute, 0x800000001C040000, src, len);
-	XPhysicalFree(allocData);
+	XPhysicalFree(pbAlloc);
 
 	return TRUE;
 }

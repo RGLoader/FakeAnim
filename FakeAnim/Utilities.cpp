@@ -17,6 +17,16 @@ void Utils::HexPrint(PBYTE pbData, size_t stLen) {
 	}
 }
 
+DWORD Utils::StringLength(const PCHAR pcStr) {
+	PCHAR pcStri = pcStr;
+	DWORD dwSize = 0;
+	while (*pcStri != 0) {
+		dwSize += 1;
+		pcStri += sizeof(CHAR);
+	}
+	return dwSize;
+}
+
 HRESULT Utils::MountPath(const char* szDrive, const char* szDevice, const char* sysStr)
 {
 	STRING DeviceName, LinkName;
@@ -65,14 +75,14 @@ BOOL Utils::ReadFile(LPCSTR lpFilename, PVOID pvBuffer, DWORD dwSize)
 	if (hFile == INVALID_HANDLE_VALUE)
 	{
 		// InfoPrint("CreateFile: %04X\n", GetLastError());
-		return false;
+		return FALSE;
 	}
 	DWORD noBytesRead;
 	::ReadFile(hFile, pvBuffer, dwSize, &noBytesRead, NULL);
 	CloseHandle(hFile);
 	if (noBytesRead <= 0)
-		return false;
-	return true;
+		return FALSE;
+	return TRUE;
 }
 
 BOOL Utils::WriteFile(LPCSTR lpFilename, PVOID pvBuffer, DWORD dwSize)
@@ -81,12 +91,12 @@ BOOL Utils::WriteFile(LPCSTR lpFilename, PVOID pvBuffer, DWORD dwSize)
 	if (hFile == INVALID_HANDLE_VALUE)
 	{
 		// InfoPrint("CreateFile: %04X\n", GetLastError());
-		return false;
+		return FALSE;
 	}
 	DWORD noBytesWritten;
 	::WriteFile(hFile, pvBuffer, dwSize, &noBytesWritten, NULL);
 	CloseHandle(hFile);
 	if (noBytesWritten != dwSize)
-		return false;
-	return true;
+		return FALSE;
+	return TRUE;
 }

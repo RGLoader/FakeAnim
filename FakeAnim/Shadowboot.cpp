@@ -1,25 +1,5 @@
 #include "stdafx.h"
 
-static HvxCall HvxQuiesceProcessor(BYTE Reason)
-{
-	__asm
-	{
-		li    r0, 0x2
-		sc
-		blr
-	}
-}
-
-static HvxCall HvxShadowboot(PVOID pvSB, DWORD cbSB, WORD Flags)
-{
-	__asm
-	{
-		li    r0, 0x21
-		sc
-		blr
-	}
-}
-
 // function each thread will run (do not run on thread 0)
 void Quiesce()
 {
@@ -180,7 +160,7 @@ Shadowboot::PATCH_SHADOWBOOT_STATUS PatchShadowboot(PBYTE pbData, DWORD dwSize) 
 	BYTE bSeHash[XECRYPT_SHA_DIGEST_SIZE];
 	ZeroMemory(bSeHash, XECRYPT_SHA_DIGEST_SIZE);
 	XeCryptRotSumSha((PBYTE)pSeBldrHdr, 0x10, pbSeData, dwSeSize - 0x20, bSeHash, XECRYPT_SHA_DIGEST_SIZE);
-	if (memcmp(bSeHash, (PBYTE)pSdBldrHdr + 588, XECRYPT_SHA_DIGEST_SIZE) != 0) {
+	if (!RtlEqualMemory(bSeHash, (PBYTE)pSdBldrHdr + 588, XECRYPT_SHA_DIGEST_SIZE)) {
 		Utils::InfoPrint("INVALID_SE_DIGEST\n");
 		return Shadowboot::PATCH_SHADOWBOOT_STATUS::INVALID_SE_DIGEST;
 	}
@@ -208,9 +188,9 @@ Shadowboot::PATCH_SHADOWBOOT_STATUS PatchShadowboot(PBYTE pbData, DWORD dwSize) 
 #pragma region Patches
 	// patch SB flag checks, these break the SB signature but we've patched the check in the HV already
 	BYTE bPatch0[4] = { 0x48, 0x00, 0x01, 0x94 };
-	memcpy((PBYTE)pSbBldrHdr + 0x1348, bPatch0, sizeof(bPatch0));
+	CopyMemory((PBYTE)pSbBldrHdr + 0x1348, bPatch0, sizeof(bPatch0));
 	BYTE bPatch1[4] = { 0x4E, 0x80, 0x00, 0x20 };
-	memcpy((PBYTE)pSbBldrHdr + 0x1E10, bPatch1, sizeof(bPatch1));
+	CopyMemory((PBYTE)pSbBldrHdr + 0x1E10, bPatch1, sizeof(bPatch1));
 #pragma endregion Patches
 #pragma region Repack
 	// generate nonces
@@ -277,8 +257,6 @@ void LaunchShadowboot(Shadowboot::PLAUNCH_SHADOWBOOT_ARGS pLsa)
 	// call HvxShadowboot here
 	HvxShadowboot(MmGetPhysicalAddress(pLsa->pbData), pLsa->dwSize, 0x200);
 	XPhysicalFree(pLsa->pbData);
-
-	return;
 }
 
 void CreateShadowbootThread(LPCSTR lpFilename) {

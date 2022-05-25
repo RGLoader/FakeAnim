@@ -62,14 +62,14 @@ BOOL PatchStuff() {
 	return TRUE;
 }
 
-BOOL CPUStuff(BOOL writeToFile) {
+BOOL CPUStuff(BOOL bWriteToFile) {
 	Utils::InfoPrint("CPU key: ");
 	BYTE CPUKeyHV[0x10];
 	HvPeekBytes(0x20, CPUKeyHV, 0x10);
 	Utils::HexPrint(CPUKeyHV, 0x10);
 	DbgPrint("\n");
 
-	if (!writeToFile)
+	if (!bWriteToFile)
 		return TRUE;
 
 	Utils::InfoPrint("Writing CPU key to file...\n");
@@ -93,13 +93,26 @@ BOOL FixCache(DWORD dwMb) {
 	return TRUE;
 }
 
+typedef void(*KISHADOWBOOT)(DWORD dwAddr, DWORD dw1, DWORD dw2);
+KISHADOWBOOT KiShadowbootOrig;
+
+void KiShadowBootHook(DWORD dwAddr, DWORD dw1, DWORD dw2) {
+	KiShadowbootOrig(dwAddr, dw1, dw2);
+}
+
+BOOL HookStuff() {
+	KiShadowbootOrig = reinterpret_cast<KISHADOWBOOT>(HookFunctionStub((PDWORD)0x80085FA8, KiShadowBootHook));
+
+	return TRUE;
+}
+
 BOOL PatchShadowbootPath() {
 	PSTRING dwHd0StrPtr;
 	// DWORD* dwExpTryToShadowBootPtr;
 
-	const char Hd0BufferOld[] = "\\Device\\Harddisk0\\Partition1\\xboxromtw2d.bin";
+	const CHAR Hd0BufferOld[] = "\\Device\\Harddisk0\\Partition1\\xboxromtw2d.bin";
 	// needs to be equal or shorter than Hd0BufferOld
-	const char Hd0BufferNew[] = "\\Device\\Harddisk0\\Partition1\\shadowboot.bin";
+	const CHAR Hd0BufferNew[] = "\\Device\\Harddisk0\\Partition1\\shadowboot.bin";
 
 	DWORD Hd0BuffLookup[] = {
 		0x80040514  // correct for my test kit
@@ -109,20 +122,20 @@ BOOL PatchShadowbootPath() {
 		PSTRING hd0Str = (PSTRING)Hd0BuffLookup[i];
 
 		// check if already patched
-		if (memcmp(hd0Str->Buffer, Hd0BufferNew, hd0Str->Length) == 0) {
+		if (RtlEqualMemory(hd0Str->Buffer, Hd0BufferNew, hd0Str->Length)) {
 			dwHd0StrPtr = (PSTRING)Hd0BuffLookup[i];
 			Utils::InfoPrint("Hd0 buffer already patched, skipping...\n");
 			break;
 		}
 
 		// check for buffer
-		if (memcmp(hd0Str->Buffer, Hd0BufferOld, hd0Str->Length) == 0) {
+		if (RtlEqualMemory(hd0Str->Buffer, Hd0BufferOld, hd0Str->Length)) {
 			dwHd0StrPtr = (PSTRING)Hd0BuffLookup[i];
 			Utils::InfoPrint("Patching hd0 buffer...\n");
 			ZeroMemory(hd0Str->Buffer, hd0Str->MaximumLength);
-			hd0Str->Length = strlen(Hd0BufferNew);
-			hd0Str->MaximumLength = strlen(Hd0BufferNew) + 1;
-			memcpy(hd0Str->Buffer, Hd0BufferNew, strlen(Hd0BufferNew));  // we want it at the original location
+			hd0Str->Length = Utils::StringLength((PCHAR)Hd0BufferNew);
+			hd0Str->MaximumLength = Utils::StringLength((PCHAR)Hd0BufferNew) + 1;
+			CopyMemory(hd0Str->Buffer, Hd0BufferNew, Utils::StringLength((PCHAR)Hd0BufferNew));  // we want it at the original location
 			Utils::InfoPrint("Shadowboot Path: \"%s\" @ 0x%X\n", hd0Str->Buffer, hd0Str->Buffer);
 			break;
 		}
@@ -131,7 +144,7 @@ BOOL PatchShadowbootPath() {
 	return TRUE;
 }
 
-void Initialize() {  // HANDLE hModule) {
+void Initialize() {
 	// check power reason
 	BYTE reason[0x10];
 	ZeroMemory(reason, 0x10);
@@ -139,12 +152,20 @@ void Initialize() {  // HANDLE hModule) {
 	if (reason[1] == SMC_PWR_REAS_12_EJECT) {
 		Utils::InfoPrint("Booted with eject button, bailing...\n");
 		ExTerminateThread(Bootanim::INITIALIZE_THREAD_EXIT_CODE::EJECT_BAIL);
+		return;
 	}
 
 #ifndef DEVKIT_TEST
 	if (XboxHardwareInfo->Flags & DM_XBOX_HW_FLAG_TESTKIT != DM_XBOX_HW_FLAG_TESTKIT) {
 		Utils::InfoPrint("This was designed for test kits, bailing...\n");
 		ExTerminateThread(Bootanim::INITIALIZE_THREAD_EXIT_CODE::MODEL_ERROR);
+		return;
+	}
+
+	if (XboxKrnlVersion->Build != 12387) {
+		Utils::InfoPrint("This was designed for test kits running 11775.3/12387, bailing...\n");
+		ExTerminateThread(Bootanim::INITIALIZE_THREAD_EXIT_CODE::KRNL_VERSION_ERROR);
+		return;
 	}
 #endif
 
@@ -155,12 +176,18 @@ void Initialize() {  // HANDLE hModule) {
 
 	Utils::InfoPrint("HDD initialized, resuming...\n");
 
-	MountStuff();
+	// create mounts
+	if (MountStuff() == FALSE) {
+		Utils::InfoPrint("Error creating symlinks!\n");
+		ExTerminateThread(Bootanim::INITIALIZE_THREAD_EXIT_CODE::MOUNT_ERROR);
+		return;
+	}
 
 	// check if the expansion is already installed
 	if (ExpansionStuff() == FALSE) {
 		Utils::InfoPrint("Error installing expansion!\n");
-		ExTerminateThread(Bootanim::INITIALIZE_THREAD_EXIT_CODE::SUCCESS);
+		ExTerminateThread(Bootanim::INITIALIZE_THREAD_EXIT_CODE::EXP_ERROR);
+		return;
 	}
 
 #ifndef DEVKIT_TEST
@@ -168,18 +195,21 @@ void Initialize() {  // HANDLE hModule) {
 	if (PatchStuff() == FALSE) {
 		Utils::InfoPrint("Error installing patches!\n");
 		ExTerminateThread(Bootanim::INITIALIZE_THREAD_EXIT_CODE::PATCH_ERROR);
+		return;
 	}
 
 	// refresh PTE tables
 	if (FixCache(4) == FALSE) {
 		Utils::InfoPrint("Error fixing PTE tables!\n");
 		ExTerminateThread(Bootanim::INITIALIZE_THREAD_EXIT_CODE::PTE_ERROR);
+		return;
 	}
 
 	// patch hd0 buffer
 	if (PatchShadowbootPath() == FALSE) {
 		Utils::InfoPrint("Error patching shadowboot path!\n");
 		ExTerminateThread(Bootanim::INITIALIZE_THREAD_EXIT_CODE::PATH_ERROR);
+		return;
 	}
 #else
 	// CPU key
@@ -203,12 +233,8 @@ EXTERN_C DWORD AnipPlayBootAnimation(HANDLE hModule, DWORD dwFlags) {
 
 	Utils::InfoPrint("AnipPlayBootAnimation\n");
 
-	HANDLE hThread;
-	DWORD dwThreadId;
-	ExCreateThread(&hThread, 0, &dwThreadId, (VOID*)XapiThreadStartup, (LPTHREAD_START_ROUTINE)Initialize, NULL, 2);
-	XSetThreadProcessor(hThread, 4);
-	SetThreadPriority(hThread, THREAD_PRIORITY_TIME_CRITICAL);
-	ResumeThread(hThread);
+	// no need to create a thread, this is called in it's own thread
+	Initialize();
 
 	return 0;
 }

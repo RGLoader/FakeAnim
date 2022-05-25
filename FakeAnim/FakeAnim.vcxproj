@@ -97,7 +97,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_LTCG|Xbox 360'">
     <LinkIncremental>false</LinkIncremental>
     <OutputFile>$(OutDir)bootanim.dll</OutputFile>
-    <ImageXexOutput>$(OutDir)FakeAnim.xex</ImageXexOutput>
+    <ImageXexOutput>$(OutDir)bootanim.xex</ImageXexOutput>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Xbox 360'">
@@ -277,15 +277,19 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="bootanim.h" />
+    <ClInclude Include="Bootanim.h" />
+    <ClInclude Include="Hooks.h" />
     <ClInclude Include="HvExpansion.h" />
+    <ClInclude Include="Hypervisor.h" />
     <ClInclude Include="Shadowboot.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Utilities.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="bootanim.cpp" />
+    <ClCompile Include="Bootanim.cpp" />
+    <ClCompile Include="Hooks.cpp" />
     <ClCompile Include="HvExpansion.cpp" />
+    <ClCompile Include="Hypervisor.cpp" />
     <ClCompile Include="Shadowboot.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Xbox 360'">Create</PrecompiledHeader>

@@ -12,7 +12,9 @@
 #include "HvExpansion.h"
 #include "Shadowboot.h"
 #include "Utilities.h"
-#include "bootanim.h"
+#include "Hooks.h"
+#include "Hypervisor.h"
+#include "Bootanim.h"
 
 // #define DEVKIT_TEST
 

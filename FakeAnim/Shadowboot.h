@@ -1,7 +1,5 @@
 #pragma once
 
-#define HvxCall QWORD _declspec(naked)
-
 #define SHADOWBOOT_SIZE 0xD0000
 #define FLASH_NONCE_SIZE 0x10
 
