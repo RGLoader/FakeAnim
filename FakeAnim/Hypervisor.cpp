@@ -8,7 +8,7 @@ HvxCall HvxQuiesceProcessor(BYTE Reason) {
 	}
 }
 
-HvxCall HvxPostOutput(DWORD dwPostCode) {
+HvxCall HvxPostOutput(BYTE bPostCode) {
 	__asm {
 		li      r0, POST_OUTPUT_SC
 		sc

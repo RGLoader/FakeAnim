@@ -151,7 +151,7 @@ void Initialize() {
 	HalGetPowerUpCause(reason);
 	if (reason[1] == SMC_PWR_REAS_12_EJECT) {
 		Utils::InfoPrint("Booted with eject button, bailing...\n");
-		HvxPostOutput(0x9A);
+		HvxPostOutput(0x7A);
 		ExTerminateThread(Bootanim::INITIALIZE_THREAD_EXIT_CODE::EJECT_BAIL);
 		return;
 	}
@@ -159,14 +159,14 @@ void Initialize() {
 #ifndef DEVKIT
 	if (XboxHardwareInfo->Flags & DM_XBOX_HW_FLAG_TESTKIT != DM_XBOX_HW_FLAG_TESTKIT) {
 		Utils::InfoPrint("This was designed for test kits, bailing...\n");
-		HvxPostOutput(0x9B);
+		HvxPostOutput(0x7B);
 		ExTerminateThread(Bootanim::INITIALIZE_THREAD_EXIT_CODE::MODEL_ERROR);
 		return;
 	}
 
 	if (XboxKrnlVersion->Build != 12387) {
 		Utils::InfoPrint("This was designed for test kits running 11775.3/12387, bailing...\n");
-		HvxPostOutput(0x9C);
+		HvxPostOutput(0x7C);
 		ExTerminateThread(Bootanim::INITIALIZE_THREAD_EXIT_CODE::KRNL_VERSION_ERROR);
 		return;
 	}
@@ -182,7 +182,7 @@ void Initialize() {
 	// create mounts
 	if (MountStuff() == FALSE) {
 		Utils::InfoPrint("Error creating symlinks!\n");
-		HvxPostOutput(0x9D);
+		HvxPostOutput(0x7D);
 		ExTerminateThread(Bootanim::INITIALIZE_THREAD_EXIT_CODE::MOUNT_ERROR);
 		return;
 	}
@@ -190,7 +190,7 @@ void Initialize() {
 	// check if the expansion is already installed
 	if (ExpansionStuff() == FALSE) {
 		Utils::InfoPrint("Error installing expansion!\n");
-		HvxPostOutput(0x9E);
+		HvxPostOutput(0x7E);
 		ExTerminateThread(Bootanim::INITIALIZE_THREAD_EXIT_CODE::EXP_ERROR);
 		return;
 	}
@@ -199,7 +199,7 @@ void Initialize() {
 	// memory protection patches
 	if (PatchStuff() == FALSE) {
 		Utils::InfoPrint("Error installing patches!\n");
-		HvxPostOutput(0x9F);
+		HvxPostOutput(0x7F);
 		ExTerminateThread(Bootanim::INITIALIZE_THREAD_EXIT_CODE::PATCH_ERROR);
 		return;
 	}
@@ -207,7 +207,7 @@ void Initialize() {
 	// refresh PTE tables
 	if (FixCache(4) == FALSE) {
 		Utils::InfoPrint("Error fixing PTE tables!\n");
-		HvxPostOutput(0xA0);
+		HvxPostOutput(0x80);
 		ExTerminateThread(Bootanim::INITIALIZE_THREAD_EXIT_CODE::PTE_ERROR);
 		return;
 	}
@@ -215,7 +215,7 @@ void Initialize() {
 	// patch hd0 buffer
 	if (PatchShadowbootPath() == FALSE) {
 		Utils::InfoPrint("Error patching shadowboot path!\n");
-		HvxPostOutput(0xA1);
+		HvxPostOutput(0x81);
 		ExTerminateThread(Bootanim::INITIALIZE_THREAD_EXIT_CODE::PATH_ERROR);
 		return;
 	}
@@ -231,7 +231,7 @@ void Initialize() {
 	// CreateShadowbootThread(SHADOWBOOT_FILE);
 #endif
 
-	HvxPostOutput(0xA2);
+	HvxPostOutput(0x82);
 	ExTerminateThread(Bootanim::INITIALIZE_THREAD_EXIT_CODE::SUCCESS);
 
 	// shadowboot will happen automatically right after this if it's quick enough

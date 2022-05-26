@@ -9,7 +9,7 @@
 #define EXPANSION_CALL_SC    0x71
 
 QWORD HvxQuiesceProcessor(BYTE Reason);
-QWORD HvxPostOutput(DWORD dwPostCode);
+QWORD HvxPostOutput(BYTE bPostCode);
 QWORD HvxShadowboot(PVOID pvSB, DWORD cbSB, WORD Flags);
 QWORD HvxExpansionInstall(INT64 addr, DWORD size);
 QWORD HvxExpansionCall(DWORD sig, QWORD Arg1, QWORD Arg2, QWORD Arg3, QWORD Arg4);
