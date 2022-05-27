@@ -11,9 +11,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="HvExpansion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -32,11 +29,14 @@
     <ClInclude Include="Hypervisor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Memory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Globals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="HvExpansion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -55,6 +55,12 @@
     <ClCompile Include="Hypervisor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Memory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Globals.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="testkit.xml" />
@@ -64,6 +70,5 @@
     <None Include="Sections\HVPP_signed.bin" />
     <None Include="Sections\xell-2f.bin" />
     <None Include="Sections\Patches.bin" />
-    <None Include="devkit.xml" />
   </ItemGroup>
 </Project>

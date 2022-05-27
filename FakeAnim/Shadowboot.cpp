@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "Bootanim.h"
 
 // function each thread will run (do not run on thread 0)
 void Quiesce()
@@ -59,11 +59,11 @@ Shadowboot::PATCH_SHADOWBOOT_STATUS PatchShadowboot(PBYTE pbData, DWORD dwSize) 
 	// SB header
 	PBLDR_HEADER pSbBldrHdr = (PBLDR_HEADER)(pbData + pFlashHdr->blHeader.Entry);
 	if (pSbBldrHdr->Magic != 0x5342) {
-		Utils::InfoPrint("INVALID_SB_HEADER");
+		DbgPrint("INVALID_SB_HEADER");
 		return Shadowboot::PATCH_SHADOWBOOT_STATUS::INVALID_SB_HEADER;
 	}
 	if (pSbBldrHdr->Build != 14352) {
-		Utils::InfoPrint("INVALID_SB_VERSION");
+		DbgPrint("INVALID_SB_VERSION");
 		return Shadowboot::PATCH_SHADOWBOOT_STATUS::INVALID_SB_VERSION;
 	}
 	PBYTE pbSbNonce = (PBYTE)pSbBldrHdr + sizeof(BLDR_HEADER);
@@ -77,7 +77,7 @@ Shadowboot::PATCH_SHADOWBOOT_STATUS PatchShadowboot(PBYTE pbData, DWORD dwSize) 
 	ZeroMemory(bSbHash, XECRYPT_SHA_DIGEST_SIZE);
 	XeCryptRotSumSha((PBYTE)pSbBldrHdr, 0x10, (PBYTE)pSbBldrHdr + 0x140, pSbBldrHdr->Size - 0x140, bSbHash, XECRYPT_SHA_DIGEST_SIZE);
 	if (!XeCryptBnQwBeSigVerify((PXECRYPT_SIG)pbSbData + 0x20, bSbHash, b1BlSalt, (PXECRYPT_RSA)&_1BlPubKey)) {
-		Utils::InfoPrint("INVALID_SB_SIGNATURE\n");
+		DbgPrint("INVALID_SB_SIGNATURE\n");
 		return Shadowboot::PATCH_SHADOWBOOT_STATUS::INVALID_SB_SIGNATURE;
 	}
 #pragma endregion SB
@@ -85,11 +85,11 @@ Shadowboot::PATCH_SHADOWBOOT_STATUS PatchShadowboot(PBYTE pbData, DWORD dwSize) 
 	// SC header
 	PBLDR_HEADER pScBldrHdr = (PBLDR_HEADER)((PBYTE)pSbBldrHdr + pSbBldrHdr->Size);
 	if (pScBldrHdr->Magic != 0x5343) {
-		Utils::InfoPrint("INVALID_SC_HEADER\n");
+		DbgPrint("INVALID_SC_HEADER\n");
 		return Shadowboot::PATCH_SHADOWBOOT_STATUS::INVALID_SC_HEADER;
 	}
 	if (pScBldrHdr->Build != 17489) {
-		Utils::InfoPrint("INVALID_SC_VERSION\n");
+		DbgPrint("INVALID_SC_VERSION\n");
 		return Shadowboot::PATCH_SHADOWBOOT_STATUS::INVALID_SC_VERSION;
 	}
 
@@ -104,7 +104,7 @@ Shadowboot::PATCH_SHADOWBOOT_STATUS PatchShadowboot(PBYTE pbData, DWORD dwSize) 
 	ZeroMemory(bScHash, XECRYPT_SHA_DIGEST_SIZE);
 	XeCryptRotSumSha((PBYTE)pScBldrHdr, 0x10, (PBYTE)pScBldrHdr + 0x120, pScBldrHdr->Size - 0x120, bScHash, XECRYPT_SHA_DIGEST_SIZE);
 	if (!XeCryptBnQwBeSigVerify((PXECRYPT_SIG)pbScData, bScHash, (PBYTE)pSbBldrHdr + 904, (PXECRYPT_RSA)((PBYTE)pSbBldrHdr + 616))) {
-		Utils::InfoPrint("INVALID_SC_SIGNATURE\n");
+		DbgPrint("INVALID_SC_SIGNATURE\n");
 		return Shadowboot::PATCH_SHADOWBOOT_STATUS::INVALID_SC_SIGNATURE;
 	}
 #pragma endregion SC
@@ -112,11 +112,11 @@ Shadowboot::PATCH_SHADOWBOOT_STATUS PatchShadowboot(PBYTE pbData, DWORD dwSize) 
 	// SD header
 	PBLDR_HEADER pSdBldrHdr = (PBLDR_HEADER)((PBYTE)pScBldrHdr + pScBldrHdr->Size);
 	if (pSdBldrHdr->Magic != 0x5344) {
-		Utils::InfoPrint("INVALID_SD_HEADER\n");
+		DbgPrint("INVALID_SD_HEADER\n");
 		return Shadowboot::PATCH_SHADOWBOOT_STATUS::INVALID_SD_HEADER;
 	}
 	if (pSdBldrHdr->Build != 17489) {
-		Utils::InfoPrint("INVALID_SD_VERSION\n");
+		DbgPrint("INVALID_SD_VERSION\n");
 		return Shadowboot::PATCH_SHADOWBOOT_STATUS::INVALID_SD_VERSION;
 	}
 	// SD nonce
@@ -132,22 +132,22 @@ Shadowboot::PATCH_SHADOWBOOT_STATUS PatchShadowboot(PBYTE pbData, DWORD dwSize) 
 	ZeroMemory(bSdHash, XECRYPT_SHA_DIGEST_SIZE);
 	XeCryptRotSumSha((PBYTE)pSdBldrHdr, 0x10, (PBYTE)pSdBldrHdr + 0x120, pSdBldrHdr->Size - 0x120, bSdHash, XECRYPT_SHA_DIGEST_SIZE);
 	if (!XeCryptBnQwBeSigVerify((PXECRYPT_SIG)pbSdData, bSdHash, (PBYTE)pSbBldrHdr + 914, (PXECRYPT_RSA)((PBYTE)pSbBldrHdr + 616))) {
-		Utils::InfoPrint("INVALID_SD_SIGNATURE\n");
+		DbgPrint("INVALID_SD_SIGNATURE\n");
 		return Shadowboot::PATCH_SHADOWBOOT_STATUS::INVALID_SD_SIGNATURE;
 	}
 #pragma endregion SD
 #pragma region SE
 	PBLDR_HEADER pSeBldrHdr = (PBLDR_HEADER)((PBYTE)pSdBldrHdr + pSdBldrHdr->Size);
 	if (pSeBldrHdr->Magic != 0x5345) {
-		Utils::InfoPrint("INVALID_SE_HEADER\n");
+		DbgPrint("INVALID_SE_HEADER\n");
 		return Shadowboot::PATCH_SHADOWBOOT_STATUS::INVALID_SE_HEADER;
 	}
 	if (pSeBldrHdr->Build != 17489) {
-		Utils::InfoPrint("INVALID_SE_VERSION\n");
+		DbgPrint("INVALID_SE_VERSION\n");
 		return Shadowboot::PATCH_SHADOWBOOT_STATUS::INVALID_SE_VERSION;
 	}
 	// correct SE size for decryption and hashing
-	DWORD dwSeSize = pSeBldrHdr->Size + 0xF & 0xFFFFFFF0;
+	DWORD dwSePaddedSize = pSeBldrHdr->Size + 0xF & 0xFFFFFFF0;
 	// SE nonce
 	PBYTE pbSeNonce = (PBYTE)pSeBldrHdr + sizeof(BLDR_HEADER);
 	// SE data
@@ -155,35 +155,35 @@ Shadowboot::PATCH_SHADOWBOOT_STATUS PatchShadowboot(PBYTE pbData, DWORD dwSize) 
 	BYTE bSeKey[0x10];
 	XeCryptHmacSha(bSdKey, sizeof(bSdKey), pbSeNonce, FLASH_NONCE_SIZE, NULL, 0, NULL, 0, bSeKey, 0x10);
 	ZeroMemory(pbSeNonce, FLASH_NONCE_SIZE);
-	XeCryptRc4(bSeKey, sizeof(bSeKey), pbSeData, dwSeSize - (sizeof(BLDR_HEADER) + FLASH_NONCE_SIZE));
+	XeCryptRc4(bSeKey, sizeof(bSeKey), pbSeData, dwSePaddedSize - (sizeof(BLDR_HEADER) + FLASH_NONCE_SIZE));
 	
 	BYTE bSeHash[XECRYPT_SHA_DIGEST_SIZE];
 	ZeroMemory(bSeHash, XECRYPT_SHA_DIGEST_SIZE);
-	XeCryptRotSumSha((PBYTE)pSeBldrHdr, 0x10, pbSeData, dwSeSize - 0x20, bSeHash, XECRYPT_SHA_DIGEST_SIZE);
+	XeCryptRotSumSha((PBYTE)pSeBldrHdr, 0x10, pbSeData, dwSePaddedSize - 0x20, bSeHash, XECRYPT_SHA_DIGEST_SIZE);
 	if (!RtlEqualMemory(bSeHash, (PBYTE)pSdBldrHdr + 588, XECRYPT_SHA_DIGEST_SIZE)) {
-		Utils::InfoPrint("INVALID_SE_DIGEST\n");
+		DbgPrint("INVALID_SE_DIGEST\n");
 		return Shadowboot::PATCH_SHADOWBOOT_STATUS::INVALID_SE_DIGEST;
 	}
 #pragma endregion SE
 #pragma region Checksums
 	if (rc_crc32(0xFFFFFFFF, (PBYTE)pSbBldrHdr, pSbBldrHdr->Size) != 0x2EA6BDFB) {
-		Utils::InfoPrint("INVALID_SB_CHECKSUM\n");
+		DbgPrint("INVALID_SB_CHECKSUM\n");
 		return Shadowboot::PATCH_SHADOWBOOT_STATUS::INVALID_SB_CHECKSUM;
 	}
 	// no checksum on SC since it can vary so much
 	if (rc_crc32(0xFFFFFFFF, (PBYTE)pSdBldrHdr, pSdBldrHdr->Size) != 0xBA7A0F91) {
-		Utils::InfoPrint("INVALID_SD_CHECKSUM\n");
+		DbgPrint("INVALID_SD_CHECKSUM\n");
 		return Shadowboot::PATCH_SHADOWBOOT_STATUS::INVALID_SD_CHECKSUM;
 	}
-	if (rc_crc32(0xFFFFFFFF, (PBYTE)pSeBldrHdr, dwSeSize) != 0xF7B5ABD3) {
-		Utils::InfoPrint("INVALID_SE_CHECKSUM\n");
+	if (rc_crc32(0xFFFFFFFF, (PBYTE)pSeBldrHdr, dwSePaddedSize) != 0xF7B5ABD3) {
+		DbgPrint("INVALID_SE_CHECKSUM\n");
 		return Shadowboot::PATCH_SHADOWBOOT_STATUS::INVALID_SE_CHECKSUM;
 	}
 
-	Utils::InfoPrint("SB: 0x%04X\n", rc_crc32(0xFFFFFFFF, (PBYTE)pSbBldrHdr, pSbBldrHdr->Size));
-	Utils::InfoPrint("SC: 0x%04X\n", rc_crc32(0xFFFFFFFF, (PBYTE)pScBldrHdr, pScBldrHdr->Size));
-	Utils::InfoPrint("SD: 0x%04X\n", rc_crc32(0xFFFFFFFF, (PBYTE)pSdBldrHdr, pSdBldrHdr->Size));
-	Utils::InfoPrint("SE: 0x%04X\n", rc_crc32(0xFFFFFFFF, (PBYTE)pSeBldrHdr, dwSeSize));
+	DbgPrint("SB: 0x%04X\n", rc_crc32(0xFFFFFFFF, (PBYTE)pSbBldrHdr, pSbBldrHdr->Size));
+	DbgPrint("SC: 0x%04X\n", rc_crc32(0xFFFFFFFF, (PBYTE)pScBldrHdr, pScBldrHdr->Size));
+	DbgPrint("SD: 0x%04X\n", rc_crc32(0xFFFFFFFF, (PBYTE)pSdBldrHdr, pSdBldrHdr->Size));
+	DbgPrint("SE: 0x%04X\n", rc_crc32(0xFFFFFFFF, (PBYTE)pSeBldrHdr, dwSePaddedSize));
 #pragma endregion Checksums
 #pragma region Patches
 	// patch SB flag checks, these break the SB signature but we've patched the check in the HV already
@@ -207,14 +207,14 @@ Shadowboot::PATCH_SHADOWBOOT_STATUS PatchShadowboot(PBYTE pbData, DWORD dwSize) 
 	XeCryptRc4(bSbKey, sizeof(bSbKey), pbSbData, pSbBldrHdr->Size - (sizeof(BLDR_HEADER) + FLASH_NONCE_SIZE));
 	XeCryptRc4(bScKey, sizeof(bScKey), pbScData, pScBldrHdr->Size - (sizeof(BLDR_HEADER) + FLASH_NONCE_SIZE));
 	XeCryptRc4(bSdKey, sizeof(bSdKey), pbSdData, pSdBldrHdr->Size - (sizeof(BLDR_HEADER) + FLASH_NONCE_SIZE));
-	XeCryptRc4(bSeKey, sizeof(bSeKey), pbSeData, dwSeSize - (sizeof(BLDR_HEADER) + FLASH_NONCE_SIZE));
+	XeCryptRc4(bSeKey, sizeof(bSeKey), pbSeData, dwSePaddedSize - (sizeof(BLDR_HEADER) + FLASH_NONCE_SIZE));
 #pragma endregion Repack
 
 	return Shadowboot::PATCH_SHADOWBOOT_STATUS::SUCCESS;
 }
 
 // this must be run on thread 0
-void LaunchShadowboot(Shadowboot::PLAUNCH_SHADOWBOOT_ARGS pLsa)
+void LaunchShadowboot(PLAUNCH_SHADOWBOOT_ARGS pLsa)
 {
 	// lets make a thread to pause each processor
 	HANDLE	hThread5;
@@ -255,37 +255,33 @@ void LaunchShadowboot(Shadowboot::PLAUNCH_SHADOWBOOT_ARGS pLsa)
 	ResumeThread(hThread1);
 
 	// call HvxShadowboot here
-	HvxShadowboot(MmGetPhysicalAddress(pLsa->pbData), pLsa->dwSize, 0x200);
-	XPhysicalFree(pLsa->pbData);
+	HvxShadowboot(MmGetPhysicalAddress(pLsa->pbData), pLsa->llSize, 0x200);
+	// XPhysicalFree(pLsa->pbData);
 }
 
 void CreateShadowbootThread(LPCSTR lpFilename) {
 	// load your shadowboot here
-	QWORD qwSize = Utils::FileSize(lpFilename);
-	if (qwSize == -1) {
-		Utils::InfoPrint("Error getting file size!\n");
+	LONGLONG llSize = Utils::FileSize(lpFilename);
+	if (llSize == -1) {
+		DbgPrint("Error getting file size!\n");
 		return;
 	}
-	PBYTE pbData = (PBYTE)XPhysicalAlloc(qwSize, MAXULONG_PTR, 0x1000, PAGE_READWRITE);
-	ZeroMemory(pbData, qwSize);
-	if (!Utils::ReadFile(lpFilename, pbData, qwSize)) {
-		Utils::InfoPrint("Error reading 0x%08X bytes from \"%s\"!\n", qwSize, lpFilename);
+	PBYTE pbAlloc = (PBYTE)XPhysicalAlloc(llSize, MAXULONG_PTR, 0x1000, PAGE_READWRITE);
+	ZeroMemory(pbAlloc, llSize);
+	if (!Utils::ReadFile(lpFilename, pbAlloc, llSize)) {
+		DbgPrint("Error reading 0x%08X bytes from \"%s\"!\n", llSize, lpFilename);
 		return;
 	}
 
 	// PatchShadowboot(pbData, qwSize);
 
-#ifndef DEVKIT
 	HANDLE hThread;
 	DWORD hThreadId;
-	Shadowboot::LAUNCH_SHADOWBOOT_ARGS lsa = { 0 };
-	lsa.pbData = pbData;
-	lsa.dwSize = qwSize;
+	LAUNCH_SHADOWBOOT_ARGS lsa = { 0 };
+	lsa.pbData = pbAlloc;
+	lsa.llSize = llSize;
 	ExCreateThread(&hThread, 0, &hThreadId, (VOID*)XapiThreadStartup, (LPTHREAD_START_ROUTINE)LaunchShadowboot, (LPVOID)&lsa, 0x427);
 	XSetThreadProcessor(hThread, 0); // important, make sure its on thread 0.
 	SetThreadPriority(hThread, THREAD_PRIORITY_TIME_CRITICAL);
 	ResumeThread(hThread);
-#else
-	XPhysicalFree(pbData);
-#endif
 }

@@ -331,6 +331,7 @@
       <PreprocessorDefinitions>NDEBUG;_XBOX;LTCG;</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)xkelib\</AdditionalIncludeDirectories>
       <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PrecompiledHeaderFile />
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -339,7 +340,7 @@
       <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
       <SetChecksum>true</SetChecksum>
       <AdditionalDependencies>xapilib.lib;xboxkrnl.lib;</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\xkelib;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)xkelib\Release11775.3\</AdditionalLibraryDirectories>
       <BaseAddress>
       </BaseAddress>
       <FixedBaseAddress>true</FixedBaseAddress>
@@ -437,33 +438,25 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Bootanim.h" />
+    <ClInclude Include="Globals.h" />
     <ClInclude Include="Hooks.h" />
     <ClInclude Include="HvExpansion.h" />
     <ClInclude Include="Hypervisor.h" />
+    <ClInclude Include="Memory.h" />
     <ClInclude Include="Shadowboot.h" />
-    <ClInclude Include="stdafx.h" />
     <ClInclude Include="Utilities.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Bootanim.cpp" />
+    <ClCompile Include="Globals.cpp" />
     <ClCompile Include="Hooks.cpp" />
     <ClCompile Include="HvExpansion.cpp" />
     <ClCompile Include="Hypervisor.cpp" />
+    <ClCompile Include="Memory.cpp" />
     <ClCompile Include="Shadowboot.cpp" />
-    <ClCompile Include="stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Xbox 360'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='CodeAnalysis|Xbox 360'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile|Xbox 360'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile_FastCap|Xbox 360'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Xbox 360'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_LTCG|Xbox 360'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TESTKIT|Xbox 360'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DEVKIT|Xbox 360'">Create</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="Utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="devkit.xml" />
     <None Include="FakeAnim.def" />
     <None Include="Sections\HVPP_signed.bin" />
     <None Include="Sections\Patches.bin" />

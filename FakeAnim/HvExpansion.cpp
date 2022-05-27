@@ -1,8 +1,6 @@
-#include "stdafx.h"
+#include "Bootanim.h"
 
 using namespace std;
-
-extern HANDLE ModuleHandle;
 
 BYTE HvPeekBYTE(QWORD qwAddr)
 {
@@ -36,7 +34,7 @@ NTSTATUS HvPeekBytes(QWORD qwAddr, PVOID pvBuffer, DWORD dwSize) {
 			CopyMemory(pvBuffer, allocData, dwSize);
 		XPhysicalFree(allocData);
 	} else
-		Utils::InfoPrint("Error allocating buffer!\n");
+		DbgPrint("Error allocating buffer!\n");
 	return result;
 }
 
@@ -66,7 +64,7 @@ NTSTATUS HvPokeBytes(QWORD qwAddr, const void* vpBuffer, DWORD dwSize) {
 		result = (NTSTATUS)HvxExpansionCall(EXPANSION_SIG, PokeBytes, qwAddr, daddr, dwSize);
 		XPhysicalFree(allocData);
 	} else
-		Utils::InfoPrint("Error allocating buffer!\n");
+		DbgPrint("Error allocating buffer!\n");
 	return result;
 }
 
@@ -109,39 +107,56 @@ BOOL ApplyHVPatches(PBYTE pbPatches, DWORD dwSize) {
 	return FALSE;
 }
 
-DWORD InstallExpansion() {
+QWORD InstallExpansion() {
 	PVOID pSecData;
 	ULONG pSecSize;
-	if (!XGetModuleSection(ModuleHandle, "exp", &pSecData, &pSecSize)) {
-		Utils::InfoPrint("Error getting \"exp\" section!\n");
-		return NULL;
+	if (!XGetModuleSection(Globals::ModuleHandle, "exp", &pSecData, &pSecSize)) {
+		DbgPrint("Error getting \"exp\" section!\n");
+		return STATUS_CANT_FIND_SECTION;
 	}
 
-	BYTE* pbAlloc = (BYTE*)XPhysicalAlloc(0x1000, MAXULONG_PTR, 0, PAGE_READWRITE);
+	PBYTE pbAlloc = (PBYTE)XPhysicalAlloc(0x1000, MAXULONG_PTR, 0, PAGE_READWRITE);
 	ZeroMemory(pbAlloc, 0x1000);
 	CopyMemory(pbAlloc, pSecData, pSecSize);
-	QWORD qwAddr = (QWORD)MmGetPhysicalAddress(pbAlloc);
-	DWORD dwRet = HvxExpansionInstall(qwAddr, 0x1000);
+	QWORD qwRet = HvxExpansionInstall((PVOID)MmGetPhysicalAddress(pbAlloc), 0x1000);
 	XPhysicalFree(pbAlloc);
-	return dwRet;
+	return qwRet;
+}
+
+void DumpHV() {
+	PBYTE pbAlloc = (PBYTE)XPhysicalAlloc(0x40000, MAXULONG_PTR, 0, MEM_LARGE_PAGES | PAGE_READWRITE | PAGE_NOCACHE);
+	ZeroMemory(pbAlloc, 0x40000);
+	HvPeekBytes(0, pbAlloc, 0x10000);
+	HvPeekBytes(0x0000010200010000, pbAlloc + 0x10000, 0x10000);
+	HvPeekBytes(0x0000010400020000, pbAlloc + 0x20000, 0x10000);
+	HvPeekBytes(0x0000010600030000, pbAlloc + 0x30000, 0x10000);
+	Utils::WriteFile("Hdd:\\HV.bin", pbAlloc, 0x40000);
+	XPhysicalFree(pbAlloc);
 }
 
 BOOL LaunchXell() {
 	PVOID pSecData;
 	ULONG pSecSize;
-	if (!XGetModuleSection(ModuleHandle, "xell", &pSecData, &pSecSize)) {
-		Utils::InfoPrint("Error getting \"xell\" section!\n");
+	if (!XGetModuleSection(Globals::ModuleHandle, "xell", &pSecData, &pSecSize)) {
+		DbgPrint("Error getting \"xell\" section!\n");
 		return FALSE;
 	}
 
 	PBYTE pbAlloc = (PBYTE)XPhysicalAlloc(pSecSize, MAXULONG_PTR, 0, MEM_LARGE_PAGES | PAGE_READWRITE | PAGE_NOCACHE);
 	ZeroMemory(pbAlloc, pSecSize);
 	CopyMemory(pbAlloc, pSecData, pSecSize);
-	UINT64 len = 0ULL + (((pSecSize + 3) / 4) & 0xFFFFFFFF);
-	UINT64 src = 0x8000000000000000ULL;
+	QWORD len = 0ULL + (((pSecSize + 3) / 4) & 0xFFFFFFFF);
+	QWORD src = 0x8000000000000000ULL;
 	src = src + ((DWORD)MmGetPhysicalAddress(pbAlloc));
 	HvxExpansionCall(EXPANSION_SIG, HvExecute, 0x800000001C040000, src, len);
 	XPhysicalFree(pbAlloc);
 
 	return TRUE;
+}
+
+VOID UARTWrite(DWORD dwData) {
+	if(!NT_SUCCESS(HvPokeDWORD(0x80000200EA001014, dwData))) {
+		DbgPrint("Error writing to UART!\n");
+	}
+	DWORD dwStatus = HvPeekDWORD(0x80000200EA001018);
 }

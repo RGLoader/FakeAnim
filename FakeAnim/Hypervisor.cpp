@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "Bootanim.h"
 
 HvxCall HvxQuiesceProcessor(BYTE Reason) {
 	__asm {
@@ -16,7 +16,7 @@ HvxCall HvxPostOutput(BYTE bPostCode) {
 	}
 }
 
-HvxCall HvxShadowboot(PVOID pvSB, DWORD cbSB, WORD Flags) {
+HvxCall HvxShadowboot(PVOID pvData, DWORD dwSize, WORD wFlags) {
 	__asm {
 		li      r0, SHADOWBOOT_SC
 		sc
@@ -24,7 +24,7 @@ HvxCall HvxShadowboot(PVOID pvSB, DWORD cbSB, WORD Flags) {
 	}
 }
 
-HvxCall HvxExpansionInstall(INT64 addr, DWORD size) {
+HvxCall HvxExpansionInstall(PVOID pvAddr, DWORD dwSize) {
 	__asm {
 		li      r0, EXPANSION_INST_SC
 		sc

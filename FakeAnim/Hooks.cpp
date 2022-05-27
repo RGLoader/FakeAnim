@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "Bootanim.h"
 
 char m_hookSection[0x500];
 int m_hookCount;

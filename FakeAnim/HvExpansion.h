@@ -2,6 +2,7 @@
 
 #define EXPANSION_SIG 'HVPP'
 #define STATUS_MEMORY_NOT_ALLOCATED ((NTSTATUS)0xC00000A0)
+#define STATUS_CANT_FIND_SECTION    ((NTSTATUS)0xC8007005)
 
 typedef enum {
 	PeekBYTE = 0,
@@ -37,6 +38,7 @@ NTSTATUS HvPokeBytes(QWORD Address, const void* Buffer, DWORD Size);
 QWORD HvReadFuseRow(int row);
 
 BOOL ApplyHVPatches(PBYTE pbPatches, DWORD dwSize);
-DWORD InstallExpansion();
+QWORD InstallExpansion();
+void DumpHV();
 BOOL LaunchXell();
-
+VOID UARTWrite(DWORD dwData);

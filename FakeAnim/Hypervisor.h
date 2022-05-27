@@ -10,6 +10,6 @@
 
 QWORD HvxQuiesceProcessor(BYTE Reason);
 QWORD HvxPostOutput(BYTE bPostCode);
-QWORD HvxShadowboot(PVOID pvSB, DWORD cbSB, WORD Flags);
-QWORD HvxExpansionInstall(INT64 addr, DWORD size);
+QWORD HvxShadowboot(PVOID pvData, DWORD dwSize, WORD wFlags);
+QWORD HvxExpansionInstall(PVOID pvAddr, DWORD dwSize);
 QWORD HvxExpansionCall(DWORD sig, QWORD Arg1, QWORD Arg2, QWORD Arg3, QWORD Arg4);

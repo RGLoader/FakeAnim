@@ -1,15 +1,4 @@
-#include "stdafx.h"
-
-void Utils::InfoPrint(const char* data, ...) {
-	va_list argp;
-	char temp[512];
-
-	DbgPrint("[FakeAnim] ");
-	va_start(argp, data);
-	RtlSnprintf(temp, 512, data, argp);
-	va_end(argp);
-	DbgPrint(temp);
-}
+#include "Bootanim.h"
 
 void Utils::HexPrint(PBYTE pbData, size_t stLen) {
 	for (int i = 0; i < stLen; i++) {
@@ -21,7 +10,7 @@ DWORD Utils::StringLength(const PCHAR pcStr) {
 	PCHAR pcStri = pcStr;
 	DWORD dwSize = 0;
 	while (*pcStri != 0) {
-		dwSize += 1;
+		dwSize += sizeof(CHAR);
 		pcStri += sizeof(CHAR);
 	}
 	return dwSize;
@@ -41,22 +30,22 @@ HRESULT Utils::MountPath(const char* szDrive, const char* szDevice, const char* 
 HRESULT Utils::CreateSymbolicLink(const char* szDrive, const char* szDevice, BOOL both) {
 	HRESULT res = -1;
 	if (both) {
-		InfoPrint("Mounting as both!\n");
+		DbgPrint("Mounting as both!\n");
 		res = Utils::MountPath(szDrive, szDevice, OBJ_SYS_STRING);
 		res |= Utils::MountPath(szDrive, szDevice, OBJ_USR_STRING);
 	} else {
 		if (KeGetCurrentProcessType() == PROC_SYSTEM) {
-			InfoPrint("Mounting as system!\n");
+			DbgPrint("Mounting as system!\n");
 			res = Utils::MountPath(szDrive, szDevice, OBJ_SYS_STRING);
 		} else {
-			InfoPrint("Mounting as user!\n");
+			DbgPrint("Mounting as user!\n");
 			res = Utils::MountPath(szDrive, szDevice, OBJ_USR_STRING);
 		}
 	}
 	return res;
 }
 
-QWORD Utils::FileSize(LPCSTR lpFilename)
+LONGLONG Utils::FileSize(LPCSTR lpFilename)
 {
 	HANDLE hFile = CreateFile(lpFilename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile == INVALID_HANDLE_VALUE)
@@ -77,10 +66,10 @@ BOOL Utils::ReadFile(LPCSTR lpFilename, PVOID pvBuffer, DWORD dwSize)
 		// InfoPrint("CreateFile: %04X\n", GetLastError());
 		return FALSE;
 	}
-	DWORD noBytesRead;
-	::ReadFile(hFile, pvBuffer, dwSize, &noBytesRead, NULL);
+	DWORD dwBytesRead;
+	::ReadFile(hFile, pvBuffer, dwSize, &dwBytesRead, NULL);
 	CloseHandle(hFile);
-	if (noBytesRead <= 0)
+	if (dwBytesRead <= 0)
 		return FALSE;
 	return TRUE;
 }
@@ -93,10 +82,10 @@ BOOL Utils::WriteFile(LPCSTR lpFilename, PVOID pvBuffer, DWORD dwSize)
 		// InfoPrint("CreateFile: %04X\n", GetLastError());
 		return FALSE;
 	}
-	DWORD noBytesWritten;
-	::WriteFile(hFile, pvBuffer, dwSize, &noBytesWritten, NULL);
+	DWORD dwBytesWritten;
+	::WriteFile(hFile, pvBuffer, dwSize, &dwBytesWritten, NULL);
 	CloseHandle(hFile);
-	if (noBytesWritten != dwSize)
+	if (dwBytesWritten != dwSize)
 		return FALSE;
 	return TRUE;
 }
