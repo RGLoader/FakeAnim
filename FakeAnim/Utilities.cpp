@@ -1,9 +1,10 @@
 #include "Bootanim.h"
 
-void Utils::HexPrint(PBYTE pbData, size_t stLen) {
-	for (int i = 0; i < stLen; i++) {
+void Utils::HexPrint(PBYTE pbData, DWORD dwSize) {
+	for (DWORD i = 0; i < dwSize; i++) {
 		DbgPrint("%02X", pbData[i]);
 	}
+	DbgPrint("\n");
 }
 
 DWORD Utils::StringLength(const PCHAR pcStr) {

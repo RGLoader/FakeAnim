@@ -99,9 +99,6 @@ BOOL FixCache(DWORD dwMb) {
 }
 
 BOOL PatchShadowbootPath() {
-	PSTRING dwHd0StrPtr;
-	// DWORD* dwExpTryToShadowBootPtr;
-
 	const CHAR Hd0BufferOld[] = "\\Device\\Harddisk0\\Partition1\\xboxromtw2d.bin";
 	// needs to be equal or shorter than Hd0BufferOld
 	const CHAR Hd0BufferNew[] = "\\Device\\Harddisk0\\Partition1\\shadowboot.bin";
@@ -110,30 +107,41 @@ BOOL PatchShadowbootPath() {
 		0x80040514  // correct for my test kit
 	};
 
-	for (DWORD i = 0; i < (sizeof(Hd0BuffLookup) / sizeof(DWORD)); i++) {
-		PSTRING hd0Str = (PSTRING)Hd0BuffLookup[i];
-
-		// check if already patched
-		if (RtlEqualMemory(hd0Str->Buffer, Hd0BufferNew, hd0Str->Length)) {
-			dwHd0StrPtr = (PSTRING)Hd0BuffLookup[i];
-			DbgPrint("Hd0 buffer already patched, skipping...\n");
-			break;
-		}
-
-		// check for buffer
-		if (RtlEqualMemory(hd0Str->Buffer, Hd0BufferOld, hd0Str->Length)) {
-			dwHd0StrPtr = (PSTRING)Hd0BuffLookup[i];
-			DbgPrint("Patching hd0 buffer...\n");
-			ZeroMemory(hd0Str->Buffer, hd0Str->MaximumLength);
-			hd0Str->Length = Utils::StringLength((PCHAR)Hd0BufferNew);
-			hd0Str->MaximumLength = Utils::StringLength((PCHAR)Hd0BufferNew) + 1;
-			CopyMemory(hd0Str->Buffer, Hd0BufferNew, Utils::StringLength((PCHAR)Hd0BufferNew));  // we want it at the original location
-			// DbgPrint("Shadowboot Path: \"%s\" @ 0x%04X\n", hd0Str->Buffer, (DWORD)hd0Str->Buffer);
-			DbgPrint("Shadowboot Path: \"%s\" @ 0x%04X\n", hd0Str->Buffer, (DWORD)hd0Str->Buffer);
-			doSync(hd0Str);
-			break;
-		}
+	PSTRING hd0Str = (PSTRING)0x80040514;
+	if(RtlEqualMemory(hd0Str->Buffer, Hd0BufferOld, hd0Str->Length)) {
+		hd0Str->Length = Utils::StringLength((PCHAR)Hd0BufferNew);
+		hd0Str->MaximumLength = hd0Str->Length + 1;
+		ZeroMemory(hd0Str->Buffer, hd0Str->MaximumLength);
+		CopyMemory(hd0Str->Buffer, Hd0BufferNew, hd0Str->Length);
+		DbgPrint("Shadowboot Path: \"%s\" @ 0x%04X\n", hd0Str->Buffer, (DWORD)hd0Str->Buffer);
+		doSync(hd0Str);
 	}
+
+	//PSTRING dwHd0StrPtr;
+	//for (DWORD i = 0; i < (sizeof(Hd0BuffLookup) / sizeof(DWORD)); i++) {
+	//	PSTRING hd0Str = (PSTRING)Hd0BuffLookup[i];
+
+	//	// check if already patched
+	//	if (RtlEqualMemory(hd0Str->Buffer, Hd0BufferNew, hd0Str->Length)) {
+	//		dwHd0StrPtr = (PSTRING)Hd0BuffLookup[i];
+	//		DbgPrint("Hd0 buffer already patched, skipping...\n");
+	//		break;
+	//	}
+
+	//	// check for buffer
+	//	if (RtlEqualMemory(hd0Str->Buffer, Hd0BufferOld, hd0Str->Length)) {
+	//		dwHd0StrPtr = (PSTRING)Hd0BuffLookup[i];
+	//		DbgPrint("Patching hd0 buffer...\n");
+	//		ZeroMemory(hd0Str->Buffer, hd0Str->MaximumLength);
+	//		hd0Str->Length = Utils::StringLength((PCHAR)Hd0BufferNew);
+	//		hd0Str->MaximumLength = Utils::StringLength((PCHAR)Hd0BufferNew) + 1;
+	//		CopyMemory(hd0Str->Buffer, Hd0BufferNew, Utils::StringLength((PCHAR)Hd0BufferNew));  // we want it at the original location
+	//		// DbgPrint("Shadowboot Path: \"%s\" @ 0x%04X\n", hd0Str->Buffer, (DWORD)hd0Str->Buffer);
+	//		DbgPrint("Shadowboot Path: \"%s\" @ 0x%04X\n", hd0Str->Buffer, (DWORD)hd0Str->Buffer);
+	//		doSync(hd0Str);
+	//		break;
+	//	}
+	//}
 
 	return TRUE;
 }
@@ -153,28 +161,29 @@ void Initialize() {
 		return;
 	}
 
-	while ((XboxHardwareInfo->Flags & DM_XBOX_HW_FLAG_HDD) != DM_XBOX_HW_FLAG_HDD) {
-		DbgPrint("Sleeping until the SATA driver is up...\n");
-		Sleep(100);
+	/*while ((XboxHardwareInfo->Flags & DM_XBOX_HW_FLAG_HDD) != DM_XBOX_HW_FLAG_HDD) {
+		DbgPrint("Waiting until the SATA driver is up...\n");
 	}
 
-	DbgPrint("HDD initialized, resuming...\n");
+	DbgPrint("HDD initialized, resuming...\n");*/
 
 	// create mounts
-	if (!MountStuff()) {
-		DbgPrint("Error creating symlinks!\n");
-		// HvxPostOutput(0x7D);
-		// ExTerminateThread(Bootanim::INITIALIZE_THREAD_EXIT_CODE::MOUNT_ERROR);
-		return;
-	}
+	//if (!MountStuff()) {
+	//	DbgPrint("Error creating symlinks!\n");
+	//	// HvxPostOutput(0x7D);
+	//	// ExTerminateThread(Bootanim::INITIALIZE_THREAD_EXIT_CODE::MOUNT_ERROR);
+	//	return;
+	//}
 
 	// check if the expansion is already installed
-	if (!ExpansionStuff()) {
-		DbgPrint("Error installing expansion!\n");
-		// HvxPostOutput(0x7E);
-		// ExTerminateThread(Bootanim::INITIALIZE_THREAD_EXIT_CODE::EXP_ERROR);
-		return;
-	}
+	//if (!ExpansionStuff()) {
+	//	DbgPrint("Error installing expansion!\n");
+	//	// HvxPostOutput(0x7E);
+	//	// ExTerminateThread(Bootanim::INITIALIZE_THREAD_EXIT_CODE::EXP_ERROR);
+	//	return;
+	//}
+
+	InstallExpansion();
 
 	// memory protection patches
 	if (!PatchStuff()) {
@@ -184,16 +193,16 @@ void Initialize() {
 		return;
 	}
 
-	// refresh PTE tables
-	if (!FixCache(4)) {
+	//// refresh PTE tables
+	if (!FixCache(16)) {
 		DbgPrint("Error fixing PTE tables!\n");
 		// HvxPostOutput(0x80);
 		// ExTerminateThread(Bootanim::INITIALIZE_THREAD_EXIT_CODE::PTE_ERROR);
 		return;
 	}
 
-	// patch hd0 buffer
-	if (!PatchShadowbootPath()) {
+	//// patch hd0 buffer
+	if(!PatchShadowbootPath()) {
 		DbgPrint("Error patching shadowboot path!\n");
 		// HvxPostOutput(0x81);
 		// ExTerminateThread(Bootanim::INITIALIZE_THREAD_EXIT_CODE::PATH_ERROR);
@@ -201,7 +210,7 @@ void Initialize() {
 	}
 }
 
-EXTERN_C DWORD AnipPlayBootAnimation(HANDLE hModule, DWORD dwFlags) {
+EXTERN_C DWORD AniPlayBootAnimation(HANDLE hModule, DWORD dwFlags) {
 	if(BootedWithEject()) {
 		DbgPrint("Booted with eject button, bailing...\n");
 		return 0;
@@ -211,23 +220,27 @@ EXTERN_C DWORD AnipPlayBootAnimation(HANDLE hModule, DWORD dwFlags) {
 
 	DbgPrint("AnipPlayBootAnimation\n");
 
-	return 0;
-}
-
-EXTERN_C DWORD AnipEndAnimation(DWORD dw1, DWORD dw2, DWORD dw3) {
-	if(BootedWithEject()) {
-		DbgPrint("Booted with eject button, bailing...\n");
-		return 0;
-	}
-
-	DbgPrint("AnipEndAnimation\n");
-
 	Initialize();
 
 	return 0;
 }
 
-EXTERN_C DWORD AnipSetLogo(DWORD dw1, DWORD dw2, DWORD dw3) {
+EXTERN_C DWORD AniEndAnimation(END_ANIMATION_TYPE eat) {
+	if(BootedWithEject()) {
+		DbgPrint("Booted with eject button, bailing...\n");
+		return 0;
+	}
+
+	if(eat == ANIM_BLOCK) {
+		DbgPrint("AniEndAnimation - Block\n");
+	} else if(eat == ANIM_TERMINATE) {
+		DbgPrint("AniEndAnimation - Terminate\n");
+	}
+
+	return 0;
+}
+
+EXTERN_C DWORD AniSetLogo(DWORD dw1, DWORD dw2, DWORD dw3) {
 	if(BootedWithEject()) {
 		DbgPrint("Booted with eject button, bailing...\n");
 		return 0;

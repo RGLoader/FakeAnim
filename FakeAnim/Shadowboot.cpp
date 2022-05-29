@@ -213,6 +213,18 @@ Shadowboot::PATCH_SHADOWBOOT_STATUS PatchShadowboot(PBYTE pbData, DWORD dwSize) 
 	return Shadowboot::PATCH_SHADOWBOOT_STATUS::SUCCESS;
 }
 
+//typedef PVOID MmAllocatePhysicalMemoryExProto(DWORD dwFlags, DWORD dwSize, DWORD dwProtect, DWORD dwMinAddr, DWORD dwMaxAddr, DWORD dwAlign);
+//MmAllocatePhysicalMemoryExProto* MmAllocatePhysicalMemoryEx = (MmAllocatePhysicalMemoryExProto*)0x80095FD8;
+
+typedef void KiShadowBootProto(DWORD dwAddr, DWORD dwSize, DWORD dwFlags);
+KiShadowBootProto* KiShadowBoot = (KiShadowBootProto*)0x80085FA8;
+
+//typedef DWORD ExpTryToBootMediaKernelProto(PSTRING psFilePath, BOOL bUnk1, BOOL bUnk2);
+//ExpTryToBootMediaKernelProto* ExpTryToBootMediaKernel = (ExpTryToBootMediaKernelProto*)0x80070F70;
+
+//typedef void ExpTryToShadowBootProto(void);
+//ExpTryToShadowBootProto* ExpTryToShadowBoot = (ExpTryToShadowBootProto*)0x800710E0;
+
 // this must be run on thread 0
 void LaunchShadowboot(PLAUNCH_SHADOWBOOT_ARGS pLsa)
 {
@@ -227,6 +239,7 @@ void LaunchShadowboot(PLAUNCH_SHADOWBOOT_ARGS pLsa)
 	DWORD hThreadId2;
 	HANDLE	hThread1;
 	DWORD hThreadId1;
+
 	ExCreateThread(&hThread5, 0, &hThreadId5, (VOID*)XapiThreadStartup, (LPTHREAD_START_ROUTINE)Quiesce, NULL, 0x427);
 	ExCreateThread(&hThread4, 0, &hThreadId4, (VOID*)XapiThreadStartup, (LPTHREAD_START_ROUTINE)Quiesce, NULL, 0x427);
 	ExCreateThread(&hThread3, 0, &hThreadId3, (VOID*)XapiThreadStartup, (LPTHREAD_START_ROUTINE)Quiesce, NULL, 0x427);
@@ -260,28 +273,36 @@ void LaunchShadowboot(PLAUNCH_SHADOWBOOT_ARGS pLsa)
 }
 
 void CreateShadowbootThread(LPCSTR lpFilename) {
-	// load your shadowboot here
+	//// load your shadowboot here
 	LONGLONG llSize = Utils::FileSize(lpFilename);
 	if (llSize == -1) {
 		DbgPrint("Error getting file size!\n");
 		return;
 	}
+
 	PBYTE pbAlloc = (PBYTE)XPhysicalAlloc(llSize, MAXULONG_PTR, 0x1000, PAGE_READWRITE);
+	// PBYTE pbAlloc = (PBYTE)MmAllocatePhysicalMemoryEx(0x2, llSize, PAGE_READWRITE, 0x1000000, 0x1800000, 0x1000);
+	// DbgPrint("MmAllocatePhysicalMemoryEx: 0x%04X\n", pbAlloc);
 	ZeroMemory(pbAlloc, llSize);
 	if (!Utils::ReadFile(lpFilename, pbAlloc, llSize)) {
 		DbgPrint("Error reading 0x%08X bytes from \"%s\"!\n", llSize, lpFilename);
 		return;
 	}
 
+	KiShadowBoot((DWORD)MmGetPhysicalAddress(pbAlloc), llSize, 0x200);
+
 	// PatchShadowboot(pbData, qwSize);
 
-	HANDLE hThread;
-	DWORD hThreadId;
-	LAUNCH_SHADOWBOOT_ARGS lsa = { 0 };
-	lsa.pbData = pbAlloc;
-	lsa.llSize = llSize;
-	ExCreateThread(&hThread, 0, &hThreadId, (VOID*)XapiThreadStartup, (LPTHREAD_START_ROUTINE)LaunchShadowboot, (LPVOID)&lsa, 0x427);
-	XSetThreadProcessor(hThread, 0); // important, make sure its on thread 0.
-	SetThreadPriority(hThread, THREAD_PRIORITY_TIME_CRITICAL);
-	ResumeThread(hThread);
+	// ExpTryToBootMediaKernel((PSTRING)0x80040514, FALSE, FALSE);
+
+	//HANDLE hThread;
+	//DWORD hThreadId;
+	//LAUNCH_SHADOWBOOT_ARGS lsa;
+	//lsa.pbData = pbAlloc;
+	//lsa.llSize = llSize;
+	//// DbgPrint("pbData: 0x%04X\nllSize: 0x%08X\n", (DWORD)lsa.pbData, lsa.llSize);
+	//ExCreateThread(&hThread, 0, &hThreadId, (VOID*)XapiThreadStartup, (LPTHREAD_START_ROUTINE)LaunchShadowboot, (LPVOID)&lsa, 0x427);
+	//XSetThreadProcessor(hThread, 0); // important, make sure its on thread 0.
+	//SetThreadPriority(hThread, THREAD_PRIORITY_TIME_CRITICAL);
+	//ResumeThread(hThread);
 }

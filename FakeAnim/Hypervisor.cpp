@@ -1,6 +1,6 @@
 #include "Bootanim.h"
 
-HvxCall HvxQuiesceProcessor(BYTE Reason) {
+HvxCall HvxQuiesceProcessor(BYTE bReason) {
 	__asm {
 		li      r0, QUIESCE_PROCESSOR_SC
 		sc

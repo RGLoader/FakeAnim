@@ -4,12 +4,10 @@
 #include <xboxmath.h>
 
 #include "xkelib.h"
-#include "Memory.h"
 #include "Globals.h"
 #include "HvExpansion.h"
 #include "Shadowboot.h"
 #include "Utilities.h"
-#include "Hooks.h"
 #include "Hypervisor.h"
 #include "Bootanim.h"
 
@@ -18,3 +16,8 @@
 
 #define CPU_KEY_FILE "Hdd:\\cpukey.bin"
 #define SHADOWBOOT_FILE "Hdd:\\shadowboot.bin"
+
+enum END_ANIMATION_TYPE : DWORD {
+	ANIM_BLOCK = 0,
+	ANIM_TERMINATE
+};

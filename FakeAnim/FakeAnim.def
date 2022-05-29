@@ -1,5 +1,5 @@
 LIBRARY bootanim.dll
 EXPORTS
-	AnipPlayBootAnimation @1
-	AnipEndAnimation @2
-	AnipSetLogo @3
+	AniPlayBootAnimation @1
+	AniEndAnimation @2
+	AniSetLogo @3
