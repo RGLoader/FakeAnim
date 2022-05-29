@@ -30,5 +30,3 @@ namespace Shadowboot {
 		INVALID_SE_CHECKSUM,
 	};
 }
-
-void CreateShadowbootThread(LPCSTR lpFilename);
